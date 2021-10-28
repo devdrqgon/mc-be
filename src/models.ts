@@ -6,11 +6,12 @@ export interface Bill {
     paid: boolean,
 }
 
-export interface Timespan {
+export interface TimeSpanPlan {
     startDate: Date,
     endDate: Date,
     moneyToBeSaved: number,
     foodBudget: number,
     othersBudget: number,
-    opsRef: Array<string>
+    opsRef: Array<string>,
+    userId: string
 }
