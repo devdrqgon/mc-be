@@ -36,20 +36,18 @@ function postPlan(plan: TimeSpanPlan) {
 }
 app.post('/plans', function (req, res) {
     try {
-        const _plan= req.body.plan
-        console.log(_plan.foodBudget)
+        const _plan = req.body.plan
         //makesure this is a valid pla
         //if no
-            // send a msg indicating what s wrong
-        //else: 
+        // send a msg indicating what s wrong
+        if (planAlreadyExists(_plan.userId)) {
+            console.log("User already has a plan")
+            throw Error("Resource already exists");
+        } else {
+            //else: 
             // assign a unique id to the plan 
             // persist it 
             // send a msg saying alles gut 
-
-        if (planAlreadyExists(_plan.userId)) {
-            console.log("it exists")
-            throw Error("Resource already exists");
-        } else {
             postPlan(_plan)
         }
         res.status(201).send(`plan of user "${_plan.userId}" was created`);
