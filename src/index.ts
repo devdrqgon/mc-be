@@ -42,7 +42,7 @@ app.post('/plans', function (req, res) {
         // send a msg indicating what s wrong
         if (planAlreadyExists(_plan.userId)) {
             console.log("User already has a plan")
-            throw Error("Resource already exists");
+            throw Error("I love chocotom");
         } else {
             //else: 
             // assign a unique id to the plan 
@@ -50,8 +50,11 @@ app.post('/plans', function (req, res) {
             // send a msg saying alles gut 
             postPlan(_plan)
         }
-        res.status(201).send(`plan of user "${_plan.userId}" was created`);
+        console.log(`plan of user "${_plan.userId}" was created`)
+        res.send(req.body.plan);
     } catch (error: any) {
-        res.status(409).send(error.message);
+        res.status(409).send({
+            "title": error.message
+        });
     }
 })
