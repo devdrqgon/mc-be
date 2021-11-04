@@ -25,6 +25,7 @@ const extractJWT = (req: Request, res: Response, next: NextFunction) => {
             config.server.token.secret,
             (error, decoded) => {
                 if (error) {
+                    logging.error(NAMESPACE, error.message)
                     return res.status(404).json({ //404 to give the 'potential attakcer less hints'
                         message: error.message,
                         error

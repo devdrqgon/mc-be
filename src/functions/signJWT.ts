@@ -9,11 +9,6 @@ const signJWT = (
     user: IUser,
     callback: (error: Error | null, token: string | null) => void
 ) => {
-    let timeSinceEpoch = new Date().getTime() // get time now  in  milliseconds
-    let serverTokenExpireTime = Number(config.server.token.expireTime) * 100000 // convert  token.expireTime to millisconds
-    let expirationTime = timeSinceEpoch + serverTokenExpireTime //  
-    let expirationTimeInSeconds = Math.floor(expirationTime / 1000)
-
     logging.info(NAMESPACE, `Attempting to sign token for ${user.username}`)
 
     /** Singing token */
@@ -26,7 +21,7 @@ const signJWT = (
             {
                 issuer: config.server.token.issuer,
                 algorithm: 'HS256',
-                expiresIn: expirationTimeInSeconds
+                expiresIn: 60 * 10 // 10 mins
             },
             (error, token) => {
                 if (error) {
