@@ -16,12 +16,13 @@ const extractJWT = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, "Validating Token...")
 
     //Etracting token
-    let token = (<string>req.headers.authoriation)?.split('')[1]
+    let token = (<string>req.headers.authorization)?.split(' ')[1]
 
     if (token) {
         /** Verifying Token */
         jwt.verify(
-            token, config.server.token.secret,
+            token,
+            config.server.token.secret,
             (error, decoded) => {
                 if (error) {
                     return res.status(404).json({ //404 to give the 'potential attakcer less hints'
@@ -38,6 +39,7 @@ const extractJWT = (req: Request, res: Response, next: NextFunction) => {
     }
     else {
         /** No Token found */
+
         return res.status(401).json({
             message: 'Unauthorized'
         })

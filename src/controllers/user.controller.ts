@@ -79,6 +79,7 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
                                 })
                             }
                             else if (token) {
+                                logging.info(NAMESPACE,`login for ${fetchedUser.username} successfull!`)
                                 return res.status(200).json({
                                     message: 'Auth Successfull',
                                     token,
@@ -101,7 +102,24 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
 }
 
 
-const getAllUsers = (req: Request, res: Response, next: NextFunction) => { }
+const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
+    User.find()
+        .select('-password')
+        .exec()
+        .then(result => {
+            return res.status(200).json({
+                result, 
+                count: result.length
+            })
+        })
+        .catch(_error => {
+            logging.error(NAMESPACE, _error.message, _error)
+            return res.status(500).json({
+                message: _error.message,
+                error: _error
+            })
+        })
+}
 
 export default {
     validateToken,
@@ -109,3 +127,4 @@ export default {
     logInUser,
     getAllUsers
 }
+
