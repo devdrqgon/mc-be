@@ -5,19 +5,24 @@ import userRoutes from "./routes/user.routes";
 import http from 'http';
 import config from "./config/config";
 import logging from "./config/logging";
+import mongoose from 'mongoose'
 
-//Create db
-// const db = new loki('mc');
-// const plans = db.addCollection('plans');
+const NAMESPACE = 'Server'
 
-const NAMESPACE = 'Server';
-const app = express();
+/** Connect to db  */
+mongoose.connect(config.mongo.url, config.mongo.options)
+    .then(() => {
+        logging.info(NAMESPACE, "MongoDB Connected!")
+    })
+    .catch(error => {
+        logging.error(NAMESPACE, "Could not connect to MongoDB!", error)
+    })
 
 
-/**TODO: Connect to db  */
+const app = express()
 
 /**TODO: Log the incoming request */
- 
+
 //Do we need cors? 
 
 /** Parse the body of the request */
@@ -36,6 +41,17 @@ const httpServer = http.createServer(app)
 
 /** Start server  */
 httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
+
+
+
+
+
+
+
+
+
+
+
 
 
 
