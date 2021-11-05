@@ -21,7 +21,7 @@ const signJWT = (
             {
                 issuer: config.server.token.issuer,
                 algorithm: 'HS256',
-                expiresIn: 60 * 10 // 10 mins
+                expiresIn: '3 days'
             },
             (error, token) => {
                 if (error) {

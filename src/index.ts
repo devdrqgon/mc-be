@@ -1,6 +1,13 @@
+
+/**
+ * Currenlty, what we have is a server that generates time-limited tokens, and only those requests containing
+ * the token are allowed to certain endpoints. 
+ * 
+ * No Support for Refresh Tokens, TODO: Research and maybe Implementation 
+ */
+
+
 import express from "express";
-import cors from 'cors';
-import { TimeSpanPlan } from "./models";
 import userRoutes from "./routes/user.routes";
 import http from 'http';
 import config from "./config/config";
@@ -18,16 +25,31 @@ mongoose.connect(config.mongo.url, config.mongo.options)
         logging.error(NAMESPACE, "Could not connect to MongoDB!", error)
     })
 
-
 const app = express()
-
-/**TODO: Log the incoming request */
-
-//Do we need cors? 
 
 /** Parse the body of the request */
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+
+
+/**TODO: Log the incoming request */
+app.use((req, res, next) => {
+    /** Log the req */
+    logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
+
+    res.on('finish', () => {
+        /** Log the res */
+        logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - STATUS: [${res.statusCode}] - IP: [${req.socket.remoteAddress}]`);
+    });
+
+    next();
+})
+
+/** Do we need cors middleware? 
+ * Not sure, 
+ * but currently, it is not used and the backend is responding to localhost react
+ */
+
 
 /**TODO:  Rules of api */
 
@@ -55,47 +77,3 @@ httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is r
 
 
 
-
-
-
-
-// function getPlans() {
-//     return plans.find()
-// }
-// app.get('/plans', function (req, res) {
-//     res.json(getPlans())
-// })
-// function planAlreadyExists(userId: string) {
-//     if (plans.find({ userId: userId }).length > 0) {
-//         return true
-//     }
-//     return false
-// }
-
-// function postPlan(plan: TimeSpanPlan) {
-//     plans.insert(plan);
-// }
-// app.post('/plans', function (req, res) {
-//     try {
-//         const _plan = req.body.plan
-//         //makesure this is a valid pla
-//         //if no
-//         // send a msg indicating what s wrong
-//         if (planAlreadyExists(_plan.userId)) {
-//             console.log("User already has a plan")
-//             throw Error("I love chocotom");
-//         } else {
-//             //else: 
-//             // assign a unique id to the plan 
-//             // persist it 
-//             // send a msg saying alles gut 
-//             postPlan(_plan)
-//         }
-//         console.log(`plan of user "${_plan.userId}" was created`)
-//         res.send(req.body.plan);
-//     } catch (error: any) {
-//         res.status(409).send({
-//             "title": error.message
-//         });
-//     }
-// })
