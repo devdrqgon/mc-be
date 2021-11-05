@@ -1,60 +1,79 @@
+
+/**
+ * Currenlty, what we have is a server that generates time-limited tokens, and only those requests containing
+ * the token are allowed to certain endpoints. 
+ * 
+ * No Support for Refresh Tokens, TODO: Research and maybe Implementation 
+ */
+
+
 import express from "express";
-import loki from 'lokijs';
-import cors from 'cors';
-import { TimeSpanPlan } from "./models";
+import userRoutes from "./routes/user.routes";
+import http from 'http';
+import config from "./config/config";
+import logging from "./config/logging";
+import mongoose from 'mongoose'
 
-//Create db
-const db = new loki('mc');
+const NAMESPACE = 'Server'
 
-const plans = db.addCollection('plans');
-const app = express();
-app.use(cors());
-const PORT = 8000;
-// Configuring express to parse incoming json 
+/** Connect to db  */
+mongoose.connect(config.mongo.url, config.mongo.options)
+    .then(() => {
+        logging.info(NAMESPACE, "MongoDB Connected!")
+    })
+    .catch(error => {
+        logging.error(NAMESPACE, "Could not connect to MongoDB!", error)
+    })
+
+const app = express()
+
+/** Parse the body of the request */
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-app.listen(PORT, () => {
-    console.log(`⚡️[server]: Server is running at https://localhost:${PORT}`);
-});
 
-function getPlans() {
-    return plans.find()
-}
-app.get('/plans', function (req, res) {
-    res.json(getPlans())
-})
-function planAlreadyExists(userId: string) {
-    if (plans.find({ userId: userId }).length > 0) {
-        return true
-    }
-    return false
-}
+/**TODO: Log the incoming request */
+app.use((req, res, next) => {
+    /** Log the req */
+    logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
 
-function postPlan(plan: TimeSpanPlan) {
-    plans.insert(plan);
-}
-app.post('/plans', function (req, res) {
-    try {
-        const _plan = req.body.plan
-        //makesure this is a valid pla
-        //if no
-        // send a msg indicating what s wrong
-        if (planAlreadyExists(_plan.userId)) {
-            console.log("User already has a plan")
-            throw Error("I love chocotom");
-        } else {
-            //else: 
-            // assign a unique id to the plan 
-            // persist it 
-            // send a msg saying alles gut 
-            postPlan(_plan)
-        }
-        console.log(`plan of user "${_plan.userId}" was created`)
-        res.send(req.body.plan);
-    } catch (error: any) {
-        res.status(409).send({
-            "title": error.message
-        });
-    }
+    res.on('finish', () => {
+        /** Log the res */
+        logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - STATUS: [${res.statusCode}] - IP: [${req.socket.remoteAddress}]`);
+    });
+
+    next();
 })
+
+/** Do we need cors middleware? 
+ * Not sure, 
+ * but currently, it is not used and the backend is responding to localhost react
+ */
+
+
+/**TODO:  Rules of api */
+
+/** Routes */
+app.use('/users', userRoutes)
+
+/** TODO: Error handling */
+
+/** Create Server */
+const httpServer = http.createServer(app)
+
+/** Start server  */
+httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
