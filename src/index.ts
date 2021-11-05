@@ -13,6 +13,7 @@ import http from 'http';
 import config from "./config/config";
 import logging from "./config/logging";
 import mongoose from 'mongoose'
+import cors from "cors";
 
 const NAMESPACE = 'Server'
 
@@ -49,10 +50,20 @@ app.use((req, res, next) => {
  * Not sure, 
  * but currently, it is not used and the backend is responding to localhost react
  */
-
+// app.use(cors)
 
 /**TODO:  Rules of api */
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 
+    if (req.method == 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+        return res.status(200).json({});
+    }
+
+    next();
+});
 /** Routes */
 app.use('/users', userRoutes)
 

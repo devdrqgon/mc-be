@@ -24,6 +24,17 @@ const registerUser = (req: Request, res: Response, next: NextFunction) => {
                 error: hashError
             })
         }
+        User.find({ username })
+            .exec()
+            .then(usrs => {
+                if (usrs.length !== 0) {
+                    return res.status(500).json({
+                        message: 'Username already taken'
+                    })
+                }
+            })
+
+
 
         const _user = new User({
             id: new mongoose.Types.ObjectId(),
@@ -56,11 +67,11 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
                     message: 'Unauthorized'
                 })
             }
-            const fetchedUser = users[0]
+            const user = users[0]
             //alles gut, let s verify password
             bcryptjs.compare(
                 password,
-                fetchedUser.password,
+                user.password,
                 (error, result) => {
                     if (error) {
                         logging.error(NAMESPACE, `Wrong password::  ${error.message}`, error)
@@ -70,7 +81,7 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
                         })
                     }
                     else if (result) {
-                        signJWT(fetchedUser, (_error, token) => {
+                        signJWT(user, (_error, token) => {
                             if (_error) {
                                 logging.error(NAMESPACE, 'Unable to sign token', _error)
 
@@ -79,11 +90,11 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
                                 })
                             }
                             else if (token) {
-                                logging.info(NAMESPACE,`login for ${fetchedUser.username} successfull!`)
+                                logging.info(NAMESPACE, `login for ${user.username} successfull!`)
                                 return res.status(200).json({
                                     message: 'Auth Successfull',
                                     token,
-                                    fetchedUser
+                                    user
                                 })
                             }
                         })
@@ -108,7 +119,7 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
         .exec()
         .then(result => {
             return res.status(200).json({
-                result, 
+                result,
                 count: result.length
             })
         })
