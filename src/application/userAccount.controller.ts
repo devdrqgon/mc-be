@@ -1,18 +1,28 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose'
-import logging from "../config/logging";
+import logging from "./config/logging";
 import bcryptjs from 'bcryptjs'
-import User from '../models/user.model'
-import signJWT from "../functions/signJWT";
+import UserDomain from '../persistence/user.schemas'
+import signJWT from "./utils/auth.utils";
 const NAMESPACE = "User"
 
 const validateToken = (req: Request, res: Response, next: NextFunction) => {
-    logging.info(NAMESPACE, "Toekn validated, user authorized..")
+    logging.info(NAMESPACE, "Token validated, user authorized..")
 
     res.status(200).json({
         message: 'Authorized'
     })
 }
+
+const createUserInfo= (req: Request, res: Response) => {
+}
+
+const getUserInfo = () => {}
+
+
+const updateUserInfo = () => {}
+
+
 
 
 const registerUser = (req: Request, res: Response, next: NextFunction) => {
@@ -24,7 +34,7 @@ const registerUser = (req: Request, res: Response, next: NextFunction) => {
                 error: hashError
             })
         }
-        User.find({ username })
+        UserDomain.UserAccountRepo.find({ username })
             .exec()
             .then(usrs => {
                 if (usrs.length !== 0) {
@@ -36,13 +46,13 @@ const registerUser = (req: Request, res: Response, next: NextFunction) => {
 
 
 
-        const _user = new User({
+        const _userAccount = new UserDomain.UserAccountRepo({
             id: new mongoose.Types.ObjectId(),
             username,
             password: hash
         })
 
-        return _user.save()
+        return _userAccount.save()
             .then((user) => {
                 res.status(201).json({ user })
             })
@@ -58,7 +68,7 @@ const registerUser = (req: Request, res: Response, next: NextFunction) => {
 
 const logInUser = (req: Request, res: Response, next: NextFunction) => {
     const { username, password } = req.body
-    User.find({ username })
+    UserDomain.UserAccountRepo.find({ username })
         .exec()
         .then(users => {
             //Check that username is found and unique,  TODO: do check that user is unqiue  in register methode!
@@ -114,7 +124,7 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
 
 
 const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
-    User.find()
+    UserDomain.UserAccountRepo.find()
         .select('-password')
         .exec()
         .then(result => {
