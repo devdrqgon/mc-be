@@ -4,7 +4,6 @@ import logging from "../../infrastructure/logging";
 import bcryptjs from 'bcryptjs'
 import UserRepo from '../../persistence/mongoose/user.schemas' //fix imports absolut
 import signJWT from "../utils/auth.utils";
-import { IUserInfo } from "../../domain/user.domain";
 const NAMESPACE = "User"
 
 const validateToken = (req: Request, res: Response, next: NextFunction) => {
@@ -14,19 +13,6 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
         message: 'Authorized'
     })
 }
-
-const createUserInfo= (req: Request, res: Response) => {
-    const {username,grossBalance} :IUserInfo = req.body
-    const userInfos: IUserInfo = {
-        username,
-        grossBalance
-    } 
-}
-
-const getUserInfo = () => {}
-
-
-const updateUserInfo = () => {}
 
 
 
@@ -51,13 +37,13 @@ const registerUser = (req: Request, res: Response, next: NextFunction) => {
             })
 
 
-        const _userAccount = new UserRepo.Account({
+        const _userAccountDoc = new UserRepo.Account({
             id: new mongoose.Types.ObjectId(), // maaaybe small maybe exclude mongoose from this file and move it to the 
             username,
             password: hash
         })
 
-        return _userAccount.save()
+        return _userAccountDoc.save()
             .then((user) => {
                 res.status(201).json({ user })
             })

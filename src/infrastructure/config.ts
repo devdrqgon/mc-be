@@ -1,10 +1,11 @@
 
 import dotenv from 'dotenv';
 import { ConnectOptions } from 'mongoose';
-
+import mongoose from 'mongoose'
+import logging from './logging';
 dotenv.config();
 
-const MONGO_OPTIONS : ConnectOptions= {
+const MONGO_OPTIONS: ConnectOptions = {
     socketTimeoutMS: 30000,
     keepAlive: true,
     autoIndex: false,
@@ -36,18 +37,31 @@ const SERVER = {
     hostname: SERVER_HOSTNAME,
     port: SERVER_PORT,
     token: {
-        expireTime: SERVER_TOKEN_EXPIRETIME, 
+        expireTime: SERVER_TOKEN_EXPIRETIME,
         issuer: SERVER_TOKEN_ISSUER,
         secret: SERVER_TOKEN_SECRET
     }
 };
 
 
- 
+
 
 const config = {
-    mongo: MONGO, 
-    server: SERVER
+    mongo: MONGO,
+    server: SERVER,
+    connectDB
 };
 
+
+function connectDB() {
+    mongoose.connect(config.mongo.url, config.mongo.options)
+        .then(() => {
+            logging.info("[CONFIG]", "MongoDB Connected!")
+        })
+        .catch(error => {
+            logging.error("[CONFIG]", "Could not connect to MongoDB!", error)
+        })
+
+
+}
 export default config;

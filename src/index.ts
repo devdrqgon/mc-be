@@ -8,7 +8,8 @@
 
 
 import express from "express";
-import userRoutes from "./api/routes/user.routes";
+import userAuthRoutes from "./api/routes/user/auth.routes"
+import userInfoRoutes from "./api/routes/user/info.routes";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
@@ -18,13 +19,7 @@ import cors from "cors";
 const NAMESPACE = 'Server'
 
 /** Connect to db  */
-mongoose.connect(config.mongo.url, config.mongo.options)
-    .then(() => {
-        logging.info(NAMESPACE, "MongoDB Connected!")
-    })
-    .catch(error => {
-        logging.error(NAMESPACE, "Could not connect to MongoDB!", error)
-    })
+// config.connectDB()
 
 const app = express()
 
@@ -36,7 +31,7 @@ app.use(express.json())
 /**TODO: Log the incoming request */
 app.use((req, res, next) => {
     /** Log the req */
-    logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
+    logging.info(NAMESPACE, `METHOD: [${req.method}] - URL: [${req.originalUrl}]`);
 
     res.on('finish', () => {
         /** Log the res */
@@ -65,7 +60,8 @@ app.use((req, res, next) => {
     next();
 });
 /** Routes */
-app.use('/users', userRoutes)
+app.use('/users/auth', userAuthRoutes)
+app.use('/users/info', userInfoRoutes)
 
 /** TODO: Error handling */
 
