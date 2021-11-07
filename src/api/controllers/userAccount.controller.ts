@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose'
-import logging from "./config/logging";
+import logging from "../../infrastructure/logging";
 import bcryptjs from 'bcryptjs'
-import UserDomain from '../persistence/user.schemas'
-import signJWT from "./utils/auth.utils";
+import UserRepo from '../../persistence/mongoose/user.schemas' //fix imports absolut
+import signJWT from "../utils/auth.utils";
+import { IUserInfo } from "../../domain/user.domain";
 const NAMESPACE = "User"
 
 const validateToken = (req: Request, res: Response, next: NextFunction) => {
@@ -15,6 +16,11 @@ const validateToken = (req: Request, res: Response, next: NextFunction) => {
 }
 
 const createUserInfo= (req: Request, res: Response) => {
+    const {username,grossBalance} :IUserInfo = req.body
+    const userInfos: IUserInfo = {
+        username,
+        grossBalance
+    } 
 }
 
 const getUserInfo = () => {}
@@ -34,7 +40,7 @@ const registerUser = (req: Request, res: Response, next: NextFunction) => {
                 error: hashError
             })
         }
-        UserDomain.UserAccountRepo.find({ username })
+        UserRepo.Account.find({ username })
             .exec()
             .then(usrs => {
                 if (usrs.length !== 0) {
@@ -45,9 +51,8 @@ const registerUser = (req: Request, res: Response, next: NextFunction) => {
             })
 
 
-
-        const _userAccount = new UserDomain.UserAccountRepo({
-            id: new mongoose.Types.ObjectId(),
+        const _userAccount = new UserRepo.Account({
+            id: new mongoose.Types.ObjectId(), // maaaybe small maybe exclude mongoose from this file and move it to the 
             username,
             password: hash
         })
@@ -68,7 +73,7 @@ const registerUser = (req: Request, res: Response, next: NextFunction) => {
 
 const logInUser = (req: Request, res: Response, next: NextFunction) => {
     const { username, password } = req.body
-    UserDomain.UserAccountRepo.find({ username })
+    UserRepo.Account.find({ username })
         .exec()
         .then(users => {
             //Check that username is found and unique,  TODO: do check that user is unqiue  in register methode!
@@ -124,7 +129,7 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
 
 
 const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
-    UserDomain.UserAccountRepo.find()
+    UserRepo.Account.find()
         .select('-password')
         .exec()
         .then(result => {

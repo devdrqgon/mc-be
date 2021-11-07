@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
-import config from '../config/config'
-import logging from '../config/logging'
+import config from '../../infrastructure/config'
+import logging from '../../infrastructure/logging'
 import IUser from '../../domain/user.domain'
 
 const NAMESPACE = 'Auth'

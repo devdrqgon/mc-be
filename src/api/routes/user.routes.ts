@@ -1,5 +1,5 @@
 import express from 'express'
-import userController from '../userAccount.controller'
+import userController from '../controllers/userAccount.controller'
 import extractJWT from '../middlewares/extractJWT'
 
 const router = express.Router()

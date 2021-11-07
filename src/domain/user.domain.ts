@@ -3,14 +3,13 @@
  * this is Domain layer 
  */
 
-import {Document} from 'mongoose'
 
-export  default interface IUser extends Document{
+export  default interface IUser{
     username: string, 
     password: string,
 }
 
-export interface IUserInfo extends Document{
+export interface IUserInfo {
     username: string,
     grossBalance: number,
     

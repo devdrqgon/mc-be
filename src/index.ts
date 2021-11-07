@@ -8,10 +8,10 @@
 
 
 import express from "express";
-import userRoutes from "./application/routes/user.routes";
+import userRoutes from "./api/routes/user.routes";
 import http from 'http';
-import config from "./application/config/config";
-import logging from "./application/config/logging";
+import config from "./infrastructure/config";
+import logging from "./infrastructure/logging";
 import mongoose from 'mongoose'
 import cors from "cors";
 
