@@ -1,0 +1,6 @@
+Connect bank 
+Manage Bills
+Manage userInfos
+Manage forgotPassword/ValidateEmail
+Add a refresh token 
+Improve auth 
