@@ -3,7 +3,7 @@ import config, { namespaces } from '../infrastructure/config'
 import logging from '../infrastructure/logging'
 import IUser from '../domain/user.domain'
 import { Request, Response, NextFunction } from 'express'
-import { UserRepo } from '../persistence/mongoose/userRepo'
+import { UserRepo } from '../persistence/user/user.repo'
 
 const NAMESPACE = 'Auth'
 

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose'
 import bcryptjs from 'bcryptjs'
 import logging from "../../infrastructure/logging"
-import { UserRepo } from "../../persistence/mongoose/userRepo";
+import { UserRepo } from "../../persistence/user/user.repo";
 import { utils } from "../utils";
 
 const NAMESPACE = "User"
