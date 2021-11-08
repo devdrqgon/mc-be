@@ -47,11 +47,11 @@ const userInfoSchema = new Schema(
  */
 
 // TODO: rename to plural
-const Account = mongoose.model<IUserDoc>('UserAccount',userAccountSchema) //Rename faile to UserSChema ??????
-const Info = mongoose.model<IUserInfoDoc>('userInfoSchema',userInfoSchema) //Rename faile to UserSChema ??????
+const Account = mongoose.model<IUserDoc>('UserAccount', userAccountSchema) //Rename faile to UserSChema ??????
+const Info = mongoose.model<IUserInfoDoc>('userInfoSchema', userInfoSchema) //Rename faile to UserSChema ??????
 
 
-export default{
+export const UserRepo = {
     Account,
     Info
 }

@@ -12,9 +12,8 @@ import userAuthRoutes from "./apis/routes/auth.route"
 import userInfoRoutes from "./apis/routes/info.route";
 import http from 'http';
 import config from "./infrastructure/config";
-import logging from "infrastructure/logging";
-import mongoose from 'mongoose'
-import cors from "cors";
+import logging from "./infrastructure/logging";
+
 
 const NAMESPACE = 'Server'
 

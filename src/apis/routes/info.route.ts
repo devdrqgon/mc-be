@@ -1,5 +1,5 @@
 import express from 'express'
-import UserInfoAPI from '../apis/info.api'
+import UserInfoAPI from '../../apis/info.api'
 import validateJWT from '../middlewares/validateJWT.middleware'
 
 const router = express.Router()

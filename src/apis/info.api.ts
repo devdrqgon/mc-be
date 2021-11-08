@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express"
 import mongoose from 'mongoose'
-import logging from "infrastructure/logging"
-import UserRepo from 'persistence/mongoose/userRepo'
-import { IUserInfo } from "domain/user.domain"
-import IUserDoc from "persistence/mongoose/user.docs"
+import { IUserInfo } from "../domain/user.domain"
+import logging from "../infrastructure/logging"
+import IUserDoc from "../persistence/mongoose/user.docs"
+import { UserRepo } from "../persistence/mongoose/userRepo"
 
 const namespace = "CONTROLLER:[USERINFO]"
 
