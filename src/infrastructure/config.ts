@@ -56,10 +56,10 @@ const config = {
 function connectDB() {
     mongoose.connect(config.mongo.url, config.mongo.options)
         .then(() => {
-            logging.info("[CONFIG]", "MongoDB Connected!")
+            logging.info("INFRASTRUCTURE", "MongoDB Connected!")
         })
         .catch(error => {
-            logging.error("[CONFIG]", "Could not connect to MongoDB!", error)
+            logging.error("INFRASTRUCTURE", "Could not connect to MongoDB!", error)
         })
 
 

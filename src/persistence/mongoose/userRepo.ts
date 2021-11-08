@@ -27,7 +27,8 @@ const userInfoSchema = new Schema(
     {
         username: {
             type: String,
-            required: true
+            required: true,
+            unique: true
         },
         grossBalance: {
             type: Number,

@@ -12,7 +12,7 @@ const NAMESPACE = "Auth"
  * @param next 
  * @returns  decoded token or 401/404 response 
  */
-const extractJWT = (req: Request, res: Response, next: NextFunction) => {
+const validateJWT = (req: Request, res: Response, next: NextFunction) => {
     logging.info(NAMESPACE, "Validating Token...")
 
     //Etracting token
@@ -47,4 +47,4 @@ const extractJWT = (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-export default extractJWT
+export default validateJWT

@@ -8,18 +8,18 @@
 
 
 import express from "express";
-import userAuthRoutes from "./api/routes/user/auth.routes"
-import userInfoRoutes from "./api/routes/user/info.routes";
+import userAuthRoutes from "./apis/routes/auth.route"
+import userInfoRoutes from "./apis/routes/info.route";
 import http from 'http';
 import config from "./infrastructure/config";
-import logging from "./infrastructure/logging";
+import logging from "infrastructure/logging";
 import mongoose from 'mongoose'
 import cors from "cors";
 
 const NAMESPACE = 'Server'
 
 /** Connect to db  */
-// config.connectDB()
+config.connectDB()
 
 const app = express()
 

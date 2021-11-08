@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose'
-import logging from "../../infrastructure/logging";
 import bcryptjs from 'bcryptjs'
-import UserRepo from '../../persistence/mongoose/user.schemas' //fix imports absolut
-import signJWT from "../utils/auth.utils";
+import signJWT from "./utils/auth.utils";
+import logging from "infrastructure/logging";
+import UserRepo from "persistence/mongoose/userRepo"
+
 const NAMESPACE = "User"
 
 const validateToken = (req: Request, res: Response, next: NextFunction) => {
