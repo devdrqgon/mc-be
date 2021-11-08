@@ -8,8 +8,8 @@
 
 
 import express from "express";
-import userAuthRoutes from "./apis/routes/auth.route"
-import userInfoRoutes from "./apis/routes/info.route";
+import userAuthRoutes from "./apis/auth/auth.route"
+import userInfoRoutes from "./apis/userInfos/info.route";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";

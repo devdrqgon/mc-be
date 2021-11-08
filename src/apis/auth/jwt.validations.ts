@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken'
 import config from '../../infrastructure/config'
 
 const NAMESPACE = "Auth"
-
 /**
  * Asynchronously verify given token using a secret or a public key to get a decoded token token
  * @param req 

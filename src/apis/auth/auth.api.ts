@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose'
 import bcryptjs from 'bcryptjs'
-import signJWT from "./utils/auth.utils";
-import logging from "../infrastructure/logging"
-import { UserRepo } from "../persistence/mongoose/userRepo";
+import logging from "../../infrastructure/logging"
+import { UserRepo } from "../../persistence/mongoose/userRepo";
+import { utils } from "../utils";
 
 const NAMESPACE = "User"
 
@@ -83,7 +83,7 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
                         })
                     }
                     else if (result) {
-                        signJWT(user, (_error, token) => {
+                        utils.signJWT(user, (_error, token) => {
                             if (_error) {
                                 logging.error(NAMESPACE, 'Unable to sign token', _error)
 

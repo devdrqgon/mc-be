@@ -5,6 +5,12 @@ import mongoose from 'mongoose'
 import logging from './logging';
 dotenv.config();
 
+export enum namespaces {
+    infrastructure="infra",
+    persistence ="persistence",
+    api ="api"
+
+}
 const MONGO_OPTIONS: ConnectOptions = {
     socketTimeoutMS: 30000,
     keepAlive: true,

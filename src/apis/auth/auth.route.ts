@@ -1,6 +1,6 @@
 import express from 'express'
-import AccountController from '../auth.api'
-import validateJWT from '../middlewares/validateJWT.middleware'
+import AccountController from './auth.api'
+import validateJWT from './jwt.validations'
 
 const router = express.Router()
 
