@@ -6,8 +6,7 @@ const postOneBill = (req: Request, res: Response, next: NextFunction) => {
     //TODO validate user exists 
 
     const { sum, text, username, paid, when } = req.body
-    let paidConverted = false
-    if (paid === "true") { paidConverted = true }
+  
 
     //TODO Get userId based on username 
     const _billDoc = new BillRepo({
@@ -15,10 +14,11 @@ const postOneBill = (req: Request, res: Response, next: NextFunction) => {
         sum,
         text,
         userId: username,  //!!!!! change this to userId
-        paid: paidConverted,
+        paid,
         when,
     })
 
+    console.log(_billDoc)
     return _billDoc.save()
         .then((bill) => {
             res.status(201).json({ bill })
@@ -36,9 +36,7 @@ const getOneBill = () => {
 }
 
 const getAllBillsOfOneUser = (req: Request, res: Response) => {
-    console.log("asdasdjsodjsijodisjoisdfjosjfoS")
     const username = req.params.username as string
-    console.info("tata",username)
     BillRepo.find({ userId: username })
     .exec()
     .then((bill) => {
