@@ -121,8 +121,8 @@ const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
         .exec()
         .then(result => {
             return res.status(200).json({
-                result,
-                count: result.length
+                count: result.length,
+                result
             })
         })
         .catch(_error => {
