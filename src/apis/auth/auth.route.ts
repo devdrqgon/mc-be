@@ -1,5 +1,5 @@
 import express from 'express'
-import AccountController from './auth.api'
+import authAPI from './auth.api'
 import validateJWT from './jwt.validations'
 
 const router = express.Router()
@@ -8,9 +8,9 @@ const router = express.Router()
 
 
 //auth  or account
-router.get('/validate',validateJWT, AccountController.validateToken)
-router.post('/register',AccountController.registerUser)
-router.post('/login',AccountController.logInUser)
-router.get('/get/all', validateJWT, AccountController.getAllUsers) 
+router.get('/validate',validateJWT, authAPI.validateToken)
+router.post('/register',authAPI.registerUser)
+router.post('/login',authAPI.logInUser)
+router.get('/get/all', validateJWT, authAPI.getAllUsers) 
 
 export = router

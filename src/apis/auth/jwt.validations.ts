@@ -31,6 +31,8 @@ const validateJWT = (req: Request, res: Response, next: NextFunction) => {
                     })
                 }
                 else {
+                    logging.info(NAMESPACE, "Token VALIDATED...")
+
                     res.locals.jwt = decoded /** pass along decoded jwt   */
                     next()
                 }

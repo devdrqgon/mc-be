@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express"
 import mongoose from 'mongoose'
 import { IUserInfo } from "../../domain/user.domain"
 import logging from "../../infrastructure/logging"
-import IUserDoc, { IUserInfoDoc } from "../../persistence/mongoose/user.docs"
-import { UserRepo } from "../../persistence/mongoose/userRepo"
+import IUserDoc, { IUserInfoDoc } from "../../persistence/user/user.docs"
+import { UserRepo } from "../../persistence/user/user.repo"
 
 const namespace = "CONTROLLER:[USERINFO]"
 
@@ -14,18 +14,18 @@ const getAllUserInfos = (req: Request, res: Response) => {
 
 //Create a middleware that verifies if the user Account exists in db
 const getOneUserInfo = (req: Request, res: Response) => {
-    logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.body)
+    logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
 
-    const { username } = req.body
-
+    const username = req.params.username as string
     UserRepo.Info.find({ username })
         .exec()
         .then((usrInfo) => {
-            return res.status(200).json({usrInfo})
+            return res.status(200).json({ info: usrInfo })
         })
         .catch((err) => {
-            logging.error("[userInfoAPI]", err.message,err)
-            // res err
+            logging.error("[userInfoAPI]", err.message, err)
+
+            return res.status(409).json({ message: 'no user info found' })
         })
 
 }
@@ -35,7 +35,7 @@ const createOneUserInfo = (req: Request, res: Response) => {
 
     const { username, grossBalance }: IUserInfo = req.body
 
-   
+
     const _userInfoDoc: IUserInfoDoc = new UserRepo.Info({
         id: new mongoose.Types.ObjectId(), // maaaybe small maybe exclude mongoose from this file and move it to the 
         username,
@@ -46,7 +46,7 @@ const createOneUserInfo = (req: Request, res: Response) => {
         .then((info) => {
             logging.info(`CONTROLLER:${namespace}`, " UserInfo Created..", req.body)
 
-            res.status(201).json({ user: info })
+            res.status(201).json({  info })
         })
         .catch((error) => {
             logging.error(`CONTROLLER:${namespace}`, " UserInfo POST Failed..", error)
