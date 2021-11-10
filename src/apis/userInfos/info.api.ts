@@ -20,7 +20,7 @@ const getOneUserInfo = (req: Request, res: Response) => {
     UserRepo.Info.find({ username })
         .exec()
         .then((usrInfo) => {
-            return res.status(200).json({ usrInfo })
+            return res.status(200).json({ info: usrInfo })
         })
         .catch((err) => {
             logging.error("[userInfoAPI]", err.message, err)
@@ -46,7 +46,7 @@ const createOneUserInfo = (req: Request, res: Response) => {
         .then((info) => {
             logging.info(`CONTROLLER:${namespace}`, " UserInfo Created..", req.body)
 
-            res.status(201).json({ user: info })
+            res.status(201).json({  info })
         })
         .catch((error) => {
             logging.error(`CONTROLLER:${namespace}`, " UserInfo POST Failed..", error)
