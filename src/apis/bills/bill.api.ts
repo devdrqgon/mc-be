@@ -18,7 +18,6 @@ const postOneBill = (req: Request, res: Response, next: NextFunction) => {
         when,
     })
 
-    console.log(_billDoc)
     return _billDoc.save()
         .then((bill) => {
             res.status(201).json({ bill })
