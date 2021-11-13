@@ -11,7 +11,7 @@ import express from "express";
 import userAuthRoutes from "./apis/auth/auth.route"
 import userInfoRoutes from "./apis/userInfos/info.route";
 import billRoutes from "./apis/bills/bill.routes";
-
+import planRoutes from './apis/plans/plan.routes'
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
@@ -64,6 +64,7 @@ app.use((req, res, next) => {
 app.use('/users/auth', userAuthRoutes)
 app.use('/users/info', userInfoRoutes)
 app.use('/bills', billRoutes)
+app.use('/plans', planRoutes)
 
 
 /** TODO: Error handling */
