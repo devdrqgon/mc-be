@@ -13,5 +13,8 @@
  export interface IUserInfoDoc extends Document{
      username: string,
      grossBalance: number,
+     daySalary: number,
+     foodBudget: number,
+     miscBudget: number,
      
  }

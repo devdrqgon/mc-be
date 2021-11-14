@@ -33,13 +33,16 @@ const getOneUserInfo = (req: Request, res: Response) => {
 const createOneUserInfo = (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to create UserInfo..", req.body)
 
-    const { username, grossBalance }: IUserInfo = req.body
+    const { username, grossBalance,daySalary,foodBudget ,miscBudget }: IUserInfo = req.body
 
 
     const _userInfoDoc: IUserInfoDoc = new UserRepo.Info({
         id: new mongoose.Types.ObjectId(), // maaaybe small maybe exclude mongoose from this file and move it to the 
         username,
-        grossBalance
+        grossBalance,
+        daySalary,
+        foodBudget,
+        miscBudget
     })
 
     return _userInfoDoc.save()

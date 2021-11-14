@@ -34,6 +34,18 @@ const userInfoSchema = new Schema(
             type: Number,
             required: true
         },
+        daySalary: {
+            type: Number,
+            required: true
+        },
+        foodBudget: {
+            type: Number,
+            required: true
+        },
+        miscBudget: {
+            type: Number,
+            required: true
+        },
     },
     {
         timestamps: true

@@ -12,5 +12,8 @@ export  default interface IUser{
 export interface IUserInfo {
     username: string,
     grossBalance: number,
+    daySalary: number,
+    foodBudget: number,
+    miscBudget: number
     
 }
