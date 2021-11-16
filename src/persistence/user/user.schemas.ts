@@ -1,7 +1,7 @@
 import mongoose, { Schema } from 'mongoose'
 import IUserDoc, { IUserInfoDoc } from './user.docs'
 
-
+//Types in mongoose are hard !
 /** try to stay DDD 
  * this is Persistence layer 
  */
@@ -76,10 +76,23 @@ const userInfoSchema = new Schema(
                         type: Boolean,
                         required: true
                     },
-                    
+
                 }
             )
         },
+        weeklybudget: {
+           type:{
+                sum: {
+                    type: Number,
+                    required: true
+                },
+                spent: {
+                    type: Number,
+                    required: true
+                }
+           },
+           required: false,
+        }
     },
     {
         timestamps: true
