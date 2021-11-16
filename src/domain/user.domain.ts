@@ -26,13 +26,13 @@ import { v4 as uuidv4 } from 'uuid';
 export class User {
 
     username: string
-    Infos: InfosOfUser
+    Infos: userPersonalInfos
     Accounts: Array<Account>
     Config: UserConfig
 
     constructor(_username: string, _Config: UserConfig) {
         this.username = _username
-        this.Infos = new InfosOfUser(_username, null, null)
+        this.Infos = new userPersonalInfos(_username, null, null)
         this.Accounts = [
             new Account(AccountType.main),
             new Account(AccountType.saving)
@@ -68,7 +68,7 @@ export class UserConfig {
 
 
 }
-export class InfosOfUser {
+export class userPersonalInfos {
 
     internalId: string
 
