@@ -21,7 +21,7 @@ const userAccountSchema = new Schema(
         timestamps: true
     }
 )
-
+//Dont force a design , e,g when u naned this file user.reop
 const userInfoSchema = new Schema(
     {
         username: {

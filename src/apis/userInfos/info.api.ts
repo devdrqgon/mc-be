@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import mongoose from 'mongoose'
 import logging from "../../infrastructure/logging"
-import { UserRepo } from "../../persistence/user/user.repo"
+import { UserRepo } from "../../persistence/user/user.schemas"
 
 const namespace = "CONTROLLER:[USERINFO]"
 
@@ -37,7 +37,7 @@ const createOneUserInfo = (req: Request, res: Response) => {
 
         let _bills: Array<any> = []
 
-        // Mongoose needs keeys for his Map of bills
+        // Mongoose needs kiees for his Map of bills
         for (let i in reqBills)
             _bills.push([i,reqBills[i]])
 
