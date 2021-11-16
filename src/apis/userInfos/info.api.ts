@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import mongoose from 'mongoose'
-import { IUserInfo } from "../../domain/user.domain"
+import { userInfo } from "os"
+import { Bill, InfosOfUser, IUserInfo, SalaryInfo } from "../../domain/user.domain"
 import logging from "../../infrastructure/logging"
 import IUserDoc, { IUserInfoDoc } from "../../persistence/user/user.docs"
 import { UserRepo } from "../../persistence/user/user.repo"
@@ -33,25 +34,40 @@ const getOneUserInfo = (req: Request, res: Response) => {
 const createOneUserInfo = (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to create UserInfo..", req.body)
 
-    const { username, grossBalance,daySalary,foodBudget ,miscBudget }: IUserInfo = req.body
+    const { username: reqUsername, salary: reqSalary, dayOfMonthOfSalary, bills: reqBills } = req.body
+
+    const getBills = () => {
+
+        let _bills: Array<any> = []
+
+        // Mongoose needs keeys for his Map of bills
+        for (let i in reqBills)
+            _bills.push([i,reqBills[i]])
+
+        return _bills 
+    }
+
+    
 
 
-    const _userInfoDoc: IUserInfoDoc = new UserRepo.Info({
+    const _userInfoDoc = new UserRepo.Info({
         id: new mongoose.Types.ObjectId(), // maaaybe small maybe exclude mongoose from this file and move it to the 
-        username,
-        grossBalance,
-        daySalary,
-        foodBudget,
-        miscBudget
+        username: reqUsername,
+        salary: reqSalary,
+        dayOfMonthOfSalary: dayOfMonthOfSalary,
+        bills:  getBills()
+
     })
 
+    //Save it!
+
     return _userInfoDoc.save()
-        .then((info) => {
+        .then((info: any) => {
             logging.info(`CONTROLLER:${namespace}`, " UserInfo Created..", req.body)
 
-            res.status(201).json({  info })
+            res.status(201).json({ info })
         })
-        .catch((error) => {
+        .catch((error: any) => {
             logging.error(`CONTROLLER:${namespace}`, " UserInfo POST Failed..", error)
 
             res.status(500).json({

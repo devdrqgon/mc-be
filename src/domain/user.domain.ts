@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto"
+import { v4 as uuidv4 } from 'uuid';
 
 // +username 
 // *              +Infos
@@ -21,16 +21,18 @@ import { randomUUID } from "crypto"
 // } 
 
 
-class User {
+
+
+export class User {
 
     username: string
-    Infos: UserInfo
+    Infos: InfosOfUser
     Accounts: Array<Account>
     Config: UserConfig
 
     constructor(_username: string, _Config: UserConfig) {
         this.username = _username
-        this.Infos = new UserInfo()
+        this.Infos = new InfosOfUser(_username, null, null)
         this.Accounts = [
             new Account(AccountType.main),
             new Account(AccountType.saving)
@@ -42,13 +44,14 @@ class User {
 }
 
 
-class UserConfig {
+
+export class UserConfig {
     MoneyForBills: number
     MoneyForFood: number
     MoneyForOthers: number
     WeeklyBudget: number
 
-    
+
 
     constructor(
         _MoneyForBills: number,
@@ -63,26 +66,34 @@ class UserConfig {
 
     }
 
-    
+
 }
-class UserInfo {
+export class InfosOfUser {
+
     internalId: string
-    salaryInfo: SalaryInfo | null
-    Bills: Array<Bill> | null
-    constructor() {
-        this.salaryInfo = null
-        this.Bills = null
-        this.internalId = randomUUID()
+
+    constructor(
+        public _username: string,
+        public salaryInfo: SalaryInfo| null ,
+        public Bills: Array<Bill>| null) {
+
+        this.internalId = uuidv4()
+
     }
 }
 
-class Bill {
+export class Bill {
     id: string
-    constructor() {
-        this.id = randomUUID()
+
+    constructor(sum: number,
+        billName: number,
+        username: string,
+        paid: boolean,
+        when: number) {
+        this.id = uuidv4()
     }
 }
-class SalaryInfo {
+export class SalaryInfo {
     salary: number
     DayOfMonthOfSalary: number
     constructor(_salary: number, _DayOfMonthOfSalary: number) {
@@ -91,12 +102,12 @@ class SalaryInfo {
     }
 }
 
-enum AccountType {
+export enum AccountType {
     main = "main",
     saving = "saving"
 
 }
-class Account {
+export class Account {
     type: AccountType
     balance: number
     active: boolean

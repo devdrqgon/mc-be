@@ -4,6 +4,7 @@
  */
 
  import {Document} from 'mongoose'
+import { InfosOfUser } from '../../domain/user.domain';
 
  export  default interface IUserDoc extends Document{
      username: string, 
@@ -11,10 +12,6 @@
  }
  
  export interface IUserInfoDoc extends Document{
-     username: string,
-     grossBalance: number,
-     daySalary: number,
-     foodBudget: number,
-     miscBudget: number,
+    infosOfUser: InfosOfUser
      
  }

@@ -22,7 +22,6 @@ const userAccountSchema = new Schema(
     }
 )
 
-
 const userInfoSchema = new Schema(
     {
         username: {
@@ -30,21 +29,36 @@ const userInfoSchema = new Schema(
             required: true,
             unique: true
         },
-        grossBalance: {
+        salary: {
             type: Number,
             required: true
         },
-        daySalary: {
+        dayOfMonthOfSalary: {
             type: Number,
             required: true
         },
-        foodBudget: {
-            type: Number,
-            required: true
-        },
-        miscBudget: {
-            type: Number,
-            required: true
+        bills: {
+            type: Map,
+            of: new Schema(
+                {
+                    billName: {
+                        type: String,
+                        required: true
+                    },
+                    username: {
+                        type: String,
+                        required: true
+                    },
+                    paid: {
+                        type: Boolean,
+                        required: true
+                    },
+                    when: {
+                        type: Number,
+                        required: true
+                    },
+                }
+            )
         },
     },
     {
@@ -60,7 +74,7 @@ const userInfoSchema = new Schema(
 
 // TODO: rename to plural
 const Account = mongoose.model<IUserDoc>('UserAccount', userAccountSchema) //Rename faile to UserSChema ??????
-const Info = mongoose.model<IUserInfoDoc>('userInfoSchema', userInfoSchema) //Rename faile to UserSChema ??????
+const Info = mongoose.model('userInfoSchema', userInfoSchema) //Rename faile to UserSChema ??????
 
 
 export const UserRepo = {
