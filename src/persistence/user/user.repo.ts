@@ -60,6 +60,26 @@ const userInfoSchema = new Schema(
                 }
             )
         },
+        accounts: {
+            type: Map,
+            of: new Schema(
+                {
+                    accountType: {
+                        type: String,
+                        required: true
+                    },
+                    balance: {
+                        type: String,
+                        required: true
+                    },
+                    active: {
+                        type: Boolean,
+                        required: true
+                    },
+                    
+                }
+            )
+        },
     },
     {
         timestamps: true

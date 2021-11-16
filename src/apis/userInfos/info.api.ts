@@ -31,7 +31,7 @@ const getOneUserInfo = (req: Request, res: Response) => {
 const createOneUserInfo = (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to create UserInfo..", req.body)
 
-    const { username: reqUsername, salary: reqSalary, dayOfMonthOfSalary, bills: reqBills } = req.body
+    const { username: reqUsername, salary: reqSalary, dayOfMonthOfSalary, bills: reqBills, accounts: reqAccounts } = req.body
 
     const getBills = () => {
 
@@ -44,6 +44,16 @@ const createOneUserInfo = (req: Request, res: Response) => {
         return _bills 
     }
 
+    const getAccounts = () => {
+        
+        let _accounts: Array<any> = []
+
+        // Mongoose needs keeys for his Map of accounts
+        for (let i in reqAccounts)
+            _accounts.push([i,reqAccounts[i]])
+
+        return _accounts 
+    }
     
 
 
@@ -52,7 +62,8 @@ const createOneUserInfo = (req: Request, res: Response) => {
         username: reqUsername,
         salary: reqSalary,
         dayOfMonthOfSalary: dayOfMonthOfSalary,
-        bills:  getBills()
+        bills:  getBills(),
+        accounts: getAccounts()
 
     })
 

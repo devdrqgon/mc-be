@@ -20,7 +20,7 @@ const MONGO_OPTIONS: ConnectOptions = {
 
 const MONGO_USERNAME = process.env.MONGO_USERNAME || 'dbUser'
 const MONGO_PASSWORD = process.env.MONGO_USERNAME || 'admin'
-const MONGO_HOST = process.env.MONGO_URL || `cluster0.b7lrz.mongodb.net/mcDB2?w=majority`
+const MONGO_HOST = process.env.MONGO_URL || `cluster0.b7lrz.mongodb.net/mcDBRed?w=majority`
 
 const MONGO = {
     host: MONGO_HOST,

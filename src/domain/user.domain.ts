@@ -27,16 +27,19 @@ export class User {
 
     username: string
     Infos: userPersonalInfos
-    Accounts: Array<Account>
     Config: UserConfig
 
     constructor(_username: string, _Config: UserConfig) {
         this.username = _username
-        this.Infos = new userPersonalInfos(_username, null, null)
-        this.Accounts = [
-            new Account(AccountType.main),
-            new Account(AccountType.saving)
-        ]
+        this.Infos = new userPersonalInfos(
+            _username,
+            null,
+            null,
+            [
+                new Account(AccountType.main),
+                new Account(AccountType.saving)
+            ]
+        )
         this.Config = _Config
 
     }
@@ -74,8 +77,10 @@ export class userPersonalInfos {
 
     constructor(
         public _username: string,
-        public salaryInfo: SalaryInfo| null ,
-        public Bills: Array<Bill>| null) {
+        public salaryInfo: SalaryInfo | null,
+        public Bills: Array<Bill> | null,
+        public Accounts: Array<Account> | null
+    ) {
 
         this.internalId = uuidv4()
 
