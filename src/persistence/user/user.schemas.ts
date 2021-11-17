@@ -87,7 +87,7 @@ const userInfoWithSalarySchema = new Schema(
         },
         weeklybudget: {
             type: {
-                sum: {
+                limit: {
                     type: Number,
                     required: true
                 },
