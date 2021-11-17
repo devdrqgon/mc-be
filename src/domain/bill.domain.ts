@@ -1,4 +1,4 @@
-export interface Bill {
+export interface IBill {
     id: string,
     sum: number,
     text: number,

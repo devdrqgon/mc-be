@@ -4,6 +4,7 @@
  */
 
  import {Document} from 'mongoose'
+import { userPersonalInfos } from '../../domain/user.domain';
 
  export  default interface IUserDoc extends Document{
      username: string, 
@@ -11,7 +12,6 @@
  }
  
  export interface IUserInfoDoc extends Document{
-     username: string,
-     grossBalance: number,
+    infosOfUser: userPersonalInfos
      
  }

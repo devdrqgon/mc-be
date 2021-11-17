@@ -1,9 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import mongoose from 'mongoose'
-import { IUserInfo } from "../../domain/user.domain"
 import logging from "../../infrastructure/logging"
-import IUserDoc, { IUserInfoDoc } from "../../persistence/user/user.docs"
-import { UserRepo } from "../../persistence/user/user.repo"
+import { UserRepo } from "../../persistence/user/user.schemas"
 
 const namespace = "CONTROLLER:[USERINFO]"
 
@@ -33,22 +31,56 @@ const getOneUserInfo = (req: Request, res: Response) => {
 const createOneUserInfo = (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to create UserInfo..", req.body)
 
-    const { username, grossBalance }: IUserInfo = req.body
+    const {
+        username: reqUsername, salary: reqSalary,
+        dayOfMonthOfSalary, weeklybudget: reqWeeklybudget,
+        bills: reqBills, accounts: reqAccounts
+    } = req.body
+
+    const getBills = () => {
+
+        let _bills: Array<any> = []
+
+        // Mongoose needs kiees for his Map of bills
+        for (let i in reqBills)
+            _bills.push([i, reqBills[i]])
+
+        return _bills
+    }
+
+    const getAccounts = () => {
+
+        let _accounts: Array<any> = []
+
+        // Mongoose needs keeys for his Map of accounts
+        for (let i in reqAccounts)
+            _accounts.push([i, reqAccounts[i]])
+
+        return _accounts
+    }
 
 
-    const _userInfoDoc: IUserInfoDoc = new UserRepo.Info({
+    const _userInfoDoc = new UserRepo.Info({
         id: new mongoose.Types.ObjectId(), // maaaybe small maybe exclude mongoose from this file and move it to the 
-        username,
-        grossBalance
+        username: reqUsername,
+        salary: reqSalary,
+        dayOfMonthOfSalary: dayOfMonthOfSalary,
+        bills: getBills(),
+        accounts: getAccounts(),
+        weeklybudget: reqWeeklybudget
+
     })
 
+    //Save it!
+
+
     return _userInfoDoc.save()
-        .then((info) => {
+        .then((info: any) => {
             logging.info(`CONTROLLER:${namespace}`, " UserInfo Created..", req.body)
 
-            res.status(201).json({  info })
+            res.status(201).json({ info })
         })
-        .catch((error) => {
+        .catch((error: any) => {
             logging.error(`CONTROLLER:${namespace}`, " UserInfo POST Failed..", error)
 
             res.status(500).json({

@@ -1,8 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import { namespaces } from '../../infrastructure/config'
-import logging from '../../infrastructure/logging'
-import { UserRepo } from '../../persistence/user/user.repo'
-import { utils } from '../utils'
 
 const post = (req: Request, res: Response, next: NextFunction) => {}
 
