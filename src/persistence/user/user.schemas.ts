@@ -22,7 +22,7 @@ const userAccountSchema = new Schema(
     }
 )
 //Dont force a design , e,g when u naned this file user.reop
-const userInfoSchema = new Schema(
+const userInfoWithSalarySchema = new Schema(
     {
         username: {
             type: String,
@@ -30,12 +30,17 @@ const userInfoSchema = new Schema(
             unique: true
         },
         salary: {
-            type: Number,
-            required: true
-        },
-        dayOfMonthOfSalary: {
-            type: Number,
-            required: true
+            type: {
+                amount: {
+                    type: Number,
+                    required: true
+                },
+                dayOfMonth: {
+                    type: Number,
+                    required: true
+                }
+            },
+            required: true,
         },
         bills: {
             type: Map,
@@ -81,7 +86,7 @@ const userInfoSchema = new Schema(
             )
         },
         weeklybudget: {
-           type:{
+            type: {
                 sum: {
                     type: Number,
                     required: true
@@ -90,8 +95,8 @@ const userInfoSchema = new Schema(
                     type: Number,
                     required: true
                 }
-           },
-           required: false,
+            },
+            required: false,
         }
     },
     {
@@ -107,7 +112,7 @@ const userInfoSchema = new Schema(
 
 // TODO: rename to plural
 const Account = mongoose.model<IUserDoc>('UserAccount', userAccountSchema) //Rename faile to UserSChema ??????
-const Info = mongoose.model('userInfoSchema', userInfoSchema) //Rename faile to UserSChema ??????
+const Info = mongoose.model('userInfoSchema', userInfoWithSalarySchema) //Rename faile to UserSChema ??????
 
 
 export const UserRepo = {
