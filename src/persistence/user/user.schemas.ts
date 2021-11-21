@@ -58,6 +58,10 @@ const userInfoWithSalarySchema = new Schema(
                         type: Boolean,
                         required: true
                     },
+                    cost: {
+                        type: Number,
+                        required: true
+                    },
                     when: {
                         type: Number,
                         required: true
@@ -85,7 +89,7 @@ const userInfoWithSalarySchema = new Schema(
                 }
             )
         },
-        weeklybudget: {
+        weeklyBudget: {
             type: {
                 limit: {
                     type: Number,

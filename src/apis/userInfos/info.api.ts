@@ -18,7 +18,7 @@ const getOneUserInfo = (req: Request, res: Response) => {
     UserRepo.Info.find({ username })
         .exec()
         .then((usrInfo) => {
-            return res.status(200).json({ info: usrInfo })
+            return res.status(200).json({ usrInfo })
         })
         .catch((err) => {
             logging.error("[userInfoAPI]", err.message, err)
@@ -33,7 +33,7 @@ const createOneUserInfo = (req: Request, res: Response) => {
 
     const {
         username: reqUsername, salary: reqSalary,
-        dayOfMonthOfSalary, weeklybudget: reqWeeklybudget,
+        dayOfMonthOfSalary, weeklyBudget: reqWeeklyBudget,
         bills: reqBills, accounts: reqAccounts
     } = req.body
 
@@ -58,7 +58,7 @@ const createOneUserInfo = (req: Request, res: Response) => {
 
         return _accounts
     }
-
+    
 
     const _userInfoDoc = new UserRepo.Info({
         id: new mongoose.Types.ObjectId(), // maaaybe small maybe exclude mongoose from this file and move it to the 
@@ -67,7 +67,7 @@ const createOneUserInfo = (req: Request, res: Response) => {
         dayOfMonthOfSalary: dayOfMonthOfSalary,
         bills: getBills(),
         accounts: getAccounts(),
-        weeklybudget: reqWeeklybudget
+        weeklyBudget: reqWeeklyBudget
 
     })
 
@@ -76,7 +76,7 @@ const createOneUserInfo = (req: Request, res: Response) => {
 
     return _userInfoDoc.save()
         .then((info: any) => {
-            logging.info(`CONTROLLER:${namespace}`, " UserInfo Created..", req.body)
+            logging.info(`CONTROLLER:${namespace}`, " UserInfo Created..", info)
 
             res.status(201).json({ info })
         })
