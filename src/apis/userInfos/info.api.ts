@@ -16,6 +16,9 @@ const getOneUserInfo = (req: Request, res: Response) => {
 
     const username = req.params.username as string
     UserRepo.Info.find({ username })
+        .select('-updatedAt')
+        .select('-createdAt')
+        .select('-_id')
         .exec()
         .then((usrInfo) => {
             return res.status(200).json({ usrInfo })
@@ -37,36 +40,15 @@ const createOneUserInfo = (req: Request, res: Response) => {
         bills: reqBills, accounts: reqAccounts
     } = req.body
 
-    const getBills = () => {
 
-        let _bills: Array<any> = []
-
-        // Mongoose needs kiees for his Map of bills
-        for (let i in reqBills)
-            _bills.push([i, reqBills[i]])
-
-        return _bills
-    }
-
-    const getAccounts = () => {
-
-        let _accounts: Array<any> = []
-
-        // Mongoose needs keeys for his Map of accounts
-        for (let i in reqAccounts)
-            _accounts.push([i, reqAccounts[i]])
-
-        return _accounts
-    }
-    
 
     const _userInfoDoc = new UserRepo.Info({
         id: new mongoose.Types.ObjectId(), // maaaybe small maybe exclude mongoose from this file and move it to the 
         username: reqUsername,
         salary: reqSalary,
         dayOfMonthOfSalary: dayOfMonthOfSalary,
-        bills: getBills(),
-        accounts: getAccounts(),
+        bills: reqBills,
+        accounts: reqAccounts,
         weeklyBudget: reqWeeklyBudget
 
     })

@@ -29,8 +29,8 @@ const userInfoWithSalarySchema = new Schema(
             required: true,
             unique: true
         },
-        salary: {
-            type: {
+        salary: new Schema(
+            {
                 amount: {
                     type: Number,
                     required: true
@@ -40,57 +40,62 @@ const userInfoWithSalarySchema = new Schema(
                     required: true
                 }
             },
-            required: true,
-        },
-        bills: {
-            type: Map,
-            of: new Schema(
-                {
-                    billName: {
-                        type: String,
-                        required: true
-                    },
-                    username: {
-                        type: String,
-                        required: true
-                    },
-                    paid: {
-                        type: Boolean,
-                        required: true
-                    },
-                    cost: {
-                        type: Number,
-                        required: true
-                    },
-                    when: {
-                        type: Number,
-                        required: true
-                    },
+            {
+                _id: false,
+                timestamps: false
+            }
+        ),
+        bills: [new Schema(
+            {
+                billName: {
+                    type: String,
+                    required: true
+                },
+                username: {
+                    type: String,
+                    required: true
+                },
+                paid: {
+                    type: Boolean,
+                    required: true
+                },
+                cost: {
+                    type: Number,
+                    required: true
+                },
+                when: {
+                    type: Number,
+                    required: true
                 }
-            )
-        },
-        accounts: {
-            type: Map,
-            of: new Schema(
-                {
-                    accountType: {
-                        type: String,
-                        required: true
-                    },
-                    balance: {
-                        type: String,
-                        required: true
-                    },
-                    active: {
-                        type: Boolean,
-                        required: true
-                    },
+            },
+            {
+                _id: true,
+                timestamps: false
+            }
+        )],
+        accounts: [new Schema(
+            {
+                accountType: {
+                    type: String,
+                    required: true
+                },
+                balance: {
+                    type: Number,
+                    required: true
+                },
+                active: {
+                    type: Boolean,
+                    required: true
+                },
 
-                }
-            )
-        },
-        weeklyBudget: {
-            type: {
+            },
+            {
+                _id: true,
+                timestamps: false
+            }
+        )],
+        weeklyBudget: new Schema(
+            {
                 limit: {
                     type: Number,
                     required: true
@@ -100,12 +105,17 @@ const userInfoWithSalarySchema = new Schema(
                     required: true
                 }
             },
-            required: false,
-        }
+            {
+                _id: false,
+                timestamps: false
+            }
+        ),
     },
     {
-        timestamps: true
+        timestamps: false,
+        versionKey: false
     }
+
 )
 
 

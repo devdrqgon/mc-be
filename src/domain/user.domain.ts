@@ -99,11 +99,11 @@ export class Bill {
     }
 }
 export class SalaryInfo {
-    salary: number
+    amount: number
     dayOfMonth: number
-    constructor(_salary: number, _DayOfMonthOfSalary: number) {
-        this.dayOfMonth = _DayOfMonthOfSalary
-        this.salary = _salary
+    constructor(_amount: number, _dayOfMonth: number) {
+        this.dayOfMonth = _dayOfMonth
+        this.amount = _amount
     }
 }
 
