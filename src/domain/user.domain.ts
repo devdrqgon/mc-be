@@ -99,18 +99,17 @@ export class Bill {
     }
 }
 export class SalaryInfo {
-    salary: number
-    DayOfMonthOfSalary: number
-    constructor(_salary: number, _DayOfMonthOfSalary: number) {
-        this.DayOfMonthOfSalary = _DayOfMonthOfSalary
-        this.salary = _salary
+    amount: number
+    dayOfMonth: number
+    constructor(_amount: number, _dayOfMonth: number) {
+        this.dayOfMonth = _dayOfMonth
+        this.amount = _amount
     }
 }
 
 export enum AccountType {
     main = "main",
     saving = "saving"
-
 }
 export class Account {
     type: AccountType

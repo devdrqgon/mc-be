@@ -16,9 +16,12 @@ const getOneUserInfo = (req: Request, res: Response) => {
 
     const username = req.params.username as string
     UserRepo.Info.find({ username })
+        .select('-updatedAt')
+        .select('-createdAt')
+        .select('-_id')
         .exec()
         .then((usrInfo) => {
-            return res.status(200).json({ info: usrInfo })
+            return res.status(200).json({ usrInfo })
         })
         .catch((err) => {
             logging.error("[userInfoAPI]", err.message, err)
@@ -33,31 +36,10 @@ const createOneUserInfo = (req: Request, res: Response) => {
 
     const {
         username: reqUsername, salary: reqSalary,
-        dayOfMonthOfSalary, weeklybudget: reqWeeklybudget,
+        dayOfMonthOfSalary, weeklyBudget: reqWeeklyBudget,
         bills: reqBills, accounts: reqAccounts
     } = req.body
 
-    const getBills = () => {
-
-        let _bills: Array<any> = []
-
-        // Mongoose needs kiees for his Map of bills
-        for (let i in reqBills)
-            _bills.push([i, reqBills[i]])
-
-        return _bills
-    }
-
-    const getAccounts = () => {
-
-        let _accounts: Array<any> = []
-
-        // Mongoose needs keeys for his Map of accounts
-        for (let i in reqAccounts)
-            _accounts.push([i, reqAccounts[i]])
-
-        return _accounts
-    }
 
 
     const _userInfoDoc = new UserRepo.Info({
@@ -65,9 +47,9 @@ const createOneUserInfo = (req: Request, res: Response) => {
         username: reqUsername,
         salary: reqSalary,
         dayOfMonthOfSalary: dayOfMonthOfSalary,
-        bills: getBills(),
-        accounts: getAccounts(),
-        weeklybudget: reqWeeklybudget
+        bills: reqBills,
+        accounts: reqAccounts,
+        weeklyBudget: reqWeeklyBudget
 
     })
 
@@ -76,7 +58,7 @@ const createOneUserInfo = (req: Request, res: Response) => {
 
     return _userInfoDoc.save()
         .then((info: any) => {
-            logging.info(`CONTROLLER:${namespace}`, " UserInfo Created..", req.body)
+            logging.info(`CONTROLLER:${namespace}`, " UserInfo Created..", info)
 
             res.status(201).json({ info })
         })

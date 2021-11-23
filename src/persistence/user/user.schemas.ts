@@ -22,67 +22,81 @@ const userAccountSchema = new Schema(
     }
 )
 //Dont force a design , e,g when u naned this file user.reop
-const userInfoSchema = new Schema(
+const userInfoWithSalarySchema = new Schema(
     {
         username: {
             type: String,
             required: true,
             unique: true
         },
-        salary: {
-            type: Number,
-            required: true
-        },
-        dayOfMonthOfSalary: {
-            type: Number,
-            required: true
-        },
-        bills: {
-            type: Map,
-            of: new Schema(
-                {
-                    billName: {
-                        type: String,
-                        required: true
-                    },
-                    username: {
-                        type: String,
-                        required: true
-                    },
-                    paid: {
-                        type: Boolean,
-                        required: true
-                    },
-                    when: {
-                        type: Number,
-                        required: true
-                    },
+        salary: new Schema(
+            {
+                amount: {
+                    type: Number,
+                    required: true
+                },
+                dayOfMonth: {
+                    type: Number,
+                    required: true
                 }
-            )
-        },
-        accounts: {
-            type: Map,
-            of: new Schema(
-                {
-                    accountType: {
-                        type: String,
-                        required: true
-                    },
-                    balance: {
-                        type: String,
-                        required: true
-                    },
-                    active: {
-                        type: Boolean,
-                        required: true
-                    },
+            },
+            {
+                _id: false,
+                timestamps: false
+            }
+        ),
+        bills: [new Schema(
+            {
+                billName: {
+                    type: String,
+                    required: true
+                },
+                username: {
+                    type: String,
+                    required: true
+                },
+                paid: {
+                    type: Boolean,
+                    required: true
+                },
+                cost: {
+                    type: Number,
+                    required: true
+                },
+                when: {
+                    type: Number,
+                    required: true
+                }
+            },
+            {
+                _id: true,
+                timestamps: false
+            }
+        )],
+        accounts: [new Schema(
+            {
+                accountType: {
+                    type: String,
+                    required: true
+                },
+                balance: {
+                    type: Number,
+                    required: true
+                },
+                active: {
+                    type: Boolean,
+                    required: true
+                },
 
-                }
-            )
-        },
-        weeklybudget: {
-           type:{
-                sum: {
+            },
+            {
+                _id: true,
+                timestamps: false
+            }
+        )],
+        weeklyBudget: new Schema(
+            {
+                limit: {
                     type: Number,
                     required: true
                 },
@@ -90,13 +104,18 @@ const userInfoSchema = new Schema(
                     type: Number,
                     required: true
                 }
-           },
-           required: false,
-        }
+            },
+            {
+                _id: false,
+                timestamps: false
+            }
+        ),
     },
     {
-        timestamps: true
+        timestamps: false,
+        versionKey: false
     }
+
 )
 
 
@@ -107,7 +126,7 @@ const userInfoSchema = new Schema(
 
 // TODO: rename to plural
 const Account = mongoose.model<IUserDoc>('UserAccount', userAccountSchema) //Rename faile to UserSChema ??????
-const Info = mongoose.model('userInfoSchema', userInfoSchema) //Rename faile to UserSChema ??????
+const Info = mongoose.model('userInfoSchema', userInfoWithSalarySchema) //Rename faile to UserSChema ??????
 
 
 export const UserRepo = {
