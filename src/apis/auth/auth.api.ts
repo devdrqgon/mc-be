@@ -65,6 +65,10 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
         .then(users => {
             //Check that username is found and unique,  TODO: do check that user is unqiue  in register methode!
             if (users.length !== 1) {
+                if (users.length > 1) {
+                    logging.error(NAMESPACE, "User not unique")
+                } else { logging.error(NAMESPACE, "User not found ") }
+
                 return res.status(401).json({
                     message: 'Unauthorized'
                 })
@@ -106,6 +110,7 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
 
         })
         .catch(_error => {
+
             logging.error(NAMESPACE, _error.message, _error)
             return res.status(500).json({
                 message: _error.message,

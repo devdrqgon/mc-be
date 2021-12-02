@@ -110,6 +110,9 @@ const userInfoWithSalarySchema = new Schema(
                 timestamps: false
             }
         ),
+        savingGoal: {
+            type: Number
+        },
     },
     {
         timestamps: false,
