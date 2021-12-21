@@ -1,10 +1,94 @@
-import { NextFunction, Request, Response } from "express";
+ import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose'
 import { userInfo } from "os";
 import { Bill } from "../../domain/user.domain";
 import logging from "../../infrastructure/logging";
 import { IUserInfoDoc } from "../../persistence/user/user.docs";
 import { UserRepo } from "../../persistence/user/user.schemas";
+
+const getAllBillsOfOneUser = (req: Request, res: Response) => {
+    //get username from request param
+    const username = req.params.username as string
+
+    //get only bills sub collection from userInfoCollection  
+
+    UserRepo.Info.find({ username })
+        .select('bills')
+        .exec()
+        .then((bills) => {
+            return res.status(200).json({ bills: bills })
+        })
+        .catch((err) => {
+            logging.error("[billsAPI]", err.message, err)
+
+            return res.status(409).json({ message: 'get bills error' })
+        })
+}
+
+const updateBill = (req: Request, res: Response) => {
+    const billId = req.params.id as string
+    const {
+        username: username, cost: reqCost,
+        when: reqWhen, paid: reqPaid,
+        billName: reqBillName
+    } = req.body
+    let balance = 0
+    //get balance
+    UserRepo.Info.find({ username })
+        .select('accounts')
+        .exec()
+        .then((accounts) => {
+            balance = accounts[0].balance
+            console.info("accounts",balance)
+        })
+        .catch((err) => {
+            logging.error("[billsAPI]", err.message, err)
+
+            return res.status(409).json({ message: 'get bills error' })
+        })
+
+    UserRepo.Info.findOneAndUpdate(
+        { "username": username, "bills._id": billId },
+        { $set: { "bills.$.paid": reqPaid } },
+        (error: any, data: any) => {
+            if (error) {
+                console.error(error)
+            } else {
+                return res.status(200).json('ok')
+
+            }
+        })
+
+}
+
+export default {
+    updateBill,
+    getAllBillsOfOneUser,
+}
+
+
+
+
+// Leftovers
+    //find user by its id, update its post with what's in req.body
+    // UserRepo.Info.findOneAndUpdate(
+    //     { username },
+    //     {
+    //         salary: {
+    //             amount: 2601,
+    //             dayOfMonth: 16
+    //         }
+    //     },
+    //     { new: true }
+    //     ,
+    //     (error: any, data: any) => {
+    //         if (error) {
+    //             console.error(error)
+    //         } else {
+    //             console.log(data)
+    //         }
+    //     })
+
 
 
 // const postOneBill = (req: Request, res: Response, next: NextFunction) => {
@@ -49,80 +133,3 @@ import { UserRepo } from "../../persistence/user/user.schemas";
 
 //     return sum
 // }
-const getAllBillsOfOneUser = (req: Request, res: Response) => {
-    //get username from request param
-    const username = req.params.username as string
-
-    //get only bills sub collection from userInfoCollection  
-
-    UserRepo.Info.find({ username })
-        .select('bills')
-        .exec()
-        .then((bills) => {
-            return res.status(200).json({ bills: bills })
-        })
-        .catch((err) => {
-            logging.error("[billsAPI]", err.message, err)
-
-            return res.status(409).json({ message: 'get bills error' })
-        })
-}
-
-const updateBill = (req: Request, res: Response) => {
-    const billId = req.params.id as string
-    const {
-        username: username, cost: reqCost,
-        when: reqWhen, paid: reqPaid,
-        billName: reqBillName
-    } = req.body
-    let balance = 0
-    //get balance
-    UserRepo.Info.find({ username })
-        .select('accounts')
-        .exec()
-        .then((accounts) => {
-            balance = accounts[0].balance
-            console.info("accounts",balance)
-        })
-        .catch((err) => {
-            logging.error("[billsAPI]", err.message, err)
-
-            return res.status(409).json({ message: 'get bills error' })
-        })
-    //find user by its id, update its post with what's in req.body
-    // UserRepo.Info.findOneAndUpdate(
-    //     { username },
-    //     {
-    //         salary: {
-    //             amount: 2601,
-    //             dayOfMonth: 16
-    //         }
-    //     },
-    //     { new: true }
-    //     ,
-    //     (error: any, data: any) => {
-    //         if (error) {
-    //             console.error(error)
-    //         } else {
-    //             console.log(data)
-    //         }
-    //     })
-
-    UserRepo.Info.findOneAndUpdate(
-        { "username": username, "bills._id": billId },
-        { $set: { "bills.$.paid": reqPaid } },
-        (error: any, data: any) => {
-            if (error) {
-                console.error(error)
-            } else {
-                return res.status(200).json('ok')
-
-            }
-        })
-
-}
-
-export default {
-    updateBill,
-    getAllBillsOfOneUser,
-}
