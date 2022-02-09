@@ -5,8 +5,9 @@ let RequisitionId
 let userBankSignInLink
 //1
 
+const selectJWT = () =>  jwt
 
-const getAccessToken = async () => {
+const requestJWT = async () => {
     try{
         let res = await   axios({
             method: 'POST',
@@ -21,7 +22,7 @@ const getAccessToken = async () => {
         })
     //    console.log(res)
        jwt = jwt + res.data.access
-       console.log(jwt)
+    //    console.log(jwt)
     }
     catch(e){
         console.error(e)
@@ -33,7 +34,8 @@ const nordigen = {
     RequisitionId,
     userBankSignInLink,
     jwt,
-    getAccessToken,
+    getAccessToken: requestJWT,
+    getJWT: selectJWT
 
 }
 

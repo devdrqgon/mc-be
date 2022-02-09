@@ -72,7 +72,7 @@ app.use('/bills', billRoutes)
 /** Test Nordigen  */
 const NordigenTester = async () =>{
     await nordigen.getAccessToken()
-    // console.log(nordigen.jwt)
+    console.log(nordigen.getJWT())
     
 } 
 NordigenTester()
