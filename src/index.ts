@@ -14,6 +14,7 @@ import billRoutes from "./apis/bills/bill.routes";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
+import nordigen from "./infrastructure/nordigenAdapter";
 
 
 const NAMESPACE = 'Server'
@@ -67,6 +68,14 @@ app.use('/bills', billRoutes)
 
 
 /** TODO: Error handling */
+
+/** Test Nordigen  */
+const NordigenTester = async () =>{
+    await nordigen.getAccessToken()
+    // console.log(nordigen.jwt)
+    
+} 
+NordigenTester()
 
 /** Create Server */
 const httpServer = http.createServer(app)

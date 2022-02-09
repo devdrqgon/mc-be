@@ -9,25 +9,42 @@ const getAllUserInfos = (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get all UserInfos..", req.body)
 
 }
+const BalanceIsRecent = (xHours: number) => {
+    let isRecent = true
+    // Get updatedAt Field from MongoDb of the field Balance 
 
+    return isRecent
+}
 //Create a middleware that verifies if the user Account exists in db
 const getOneUserInfo = (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
 
-    const username = req.params.username as string
-    UserRepo.Info.find({ username })
-        .select('-updatedAt')
-        .select('-createdAt')
-        .select('-_id')
-        .exec()
-        .then((usrInfo) => {
-            return res.status(200).json({ usrInfo })
-        })
-        .catch((err) => {
-            logging.error("[userInfoAPI]", err.message, err)
+    //Is the balance amount more recent than 24/3 = 8 hours? 
+    if (BalanceIsRecent(8)) {
+        const username = req.params.username as string
+        UserRepo.Info.find({ username })
+            .select('-updatedAt')
+            .select('-createdAt')
+            .select('-_id')
+            .exec()
+            .then((usrInfo) => {
+                return res.status(200).json({ usrInfo })
+            })
+            .catch((err) => {
+                logging.error("[userInfoAPI]", err.message, err)
 
-            return res.status(409).json({ message: 'no user info found' })
-        })
+                return res.status(409).json({ message: 'no user info found' })
+            })
+    }
+    else{
+        // Balance is old, update from NordigenAPI 
+        
+        //Get new balance from NordigenAPI 
+
+        //Update db
+        
+    }   
+
 
 }
 
