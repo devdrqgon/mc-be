@@ -71,9 +71,9 @@ app.use('/bills', billRoutes)
 
 /** Test Nordigen  */
 const NordigenTester = async () =>{
-    await nordigen.getAccessToken()
-    console.log(nordigen.getJWT())
-    
+    await nordigen.requestJWT()
+    await nordigen.createRequisition('KSK_HEILBRONN_HEISDE66XXX')
+    console.log("LINK", nordigen.selectLink())
 } 
 NordigenTester()
 
