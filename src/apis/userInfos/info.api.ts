@@ -22,21 +22,29 @@ const getOneUserInfo = async (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
     const username = req.params.username as string
     //Is the balance amount more recent than 24/3 = 8 hours? 
-    let newBalance = await nordigen.requestBalance()
+    // await nordigen.requestJWT()
+    // let newBalance = await nordigen.requestBalance()
 
     //Update db
-    BalanceRepo.Balance.findOneAndUpdate(
-        { "username": username },
-        { $set: { "amount": newBalance } },
-        (error: any, data: any) => {
-            if (error) {
-                console.error(error)
-            } else {
-                return res.status(200).json({ data })
+    // BalanceRepo.Balance.findOneAndUpdate(
+    //     { "username": username },
+    //     { $set: { "amount": '666' } },
+    //     (error: any, data: any) => {
+    //         if (error) {
+    //             console.error(error)
+    //         } else {
+    //             return res.status(200).json({ data })
 
-            }
-        })
+    //         }
+    //     })
 
+
+    const filter = { username: username }
+    const update = { amount: "666" }
+    let doc = await BalanceRepo.Balance.findOneAndUpdate(filter, update, {
+        new: true
+    });
+    console.log(doc)
 
 }
 
@@ -93,3 +101,39 @@ export default {
     createOneUserInfo,
     UpdateOneUserInfo
 }
+
+
+// if (true) {
+//     UserRepo.Info.find({ username })
+//         .select('-updatedAt')
+//         .select('-createdAt')
+//         .select('-_id')
+//         .exec()
+//         .then((usrInfo) => {
+
+//             return res.status(200).json({ usrInfo })
+//         })
+//         .catch((err) => {
+//             logging.error("[userInfoAPI]", err.message, err)
+
+//             return res.status(409).json({ message: 'no user info found' })
+//         })
+// }
+// else{
+//     // Balance is old, update from NordigenAPI 
+//     //Get new balance from NordigenAPI 
+//     let newBalance =  await nordigen.requestBalance()
+
+//     //Update db
+//     BalanceRepo.Balance.findOneAndUpdate(
+//         { "username": username },
+//         { $set: { "amount": newBalance } },
+//         (error: any, data: any) => {
+//             if (error) {
+//                 console.error(error)
+//             } else {
+//                 return res.status(200).json({data})
+
+//             }
+//         })
+// }   
