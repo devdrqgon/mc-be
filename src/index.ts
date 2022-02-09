@@ -71,9 +71,11 @@ app.use('/bills', billRoutes)
 
 /** Test Nordigen  */
 const NordigenTester = async () =>{
-    await nordigen.requestJWT()
-    await nordigen.createRequisition('KSK_HEILBRONN_HEISDE66XXX')
-    console.log("LINK", nordigen.selectLink())
+    // await nordigen.requestJWT()
+    // await nordigen.createRequisition('KSK_HEILBRONN_HEISDE66XXX')
+    // const balance = await nordigen.requestBalance()
+    // console.log("good job bouhmid, your balance is:"+ balance)
+    // console.log("LINK", nordigen.selectLink())
 } 
 NordigenTester()
 

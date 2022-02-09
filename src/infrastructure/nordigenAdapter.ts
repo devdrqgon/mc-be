@@ -3,14 +3,14 @@ import axios from 'axios'
 import { v4 as uuidv4, v4 } from 'uuid'
 
 let jwt = 'Bearer  '
-let RequisitionId
+let MyAccountID66 = '609c3976-df41-4253-ae1a-6be551db8959' //NOw hard coded, will be dynamic in prod 
 let userBankSignInLink = 'undef'
 
 //1
 
 const selectJWT = () => jwt
 const selectLink = () => userBankSignInLink
-
+const selectMyAccountID66  = () => MyAccountID66
 const requestJWT = async () => {
     try {
         let res = await axios({
@@ -25,7 +25,7 @@ const requestJWT = async () => {
             },
         })
         //    console.log(res)
-        jwt = jwt + res.data.access
+        jwt = res.data.access
         //    console.log(jwt)
     }
     catch (e) {
@@ -37,13 +37,14 @@ const requestJWT = async () => {
 // get link for user to sign in, and save RequisitionId 
 const createRequisition = async (bankId: string) => {
     try {
+        // console.log("JWWWWWT", jwt)
         let res = await axios({
             method: 'POST',
             url: 'https://ob.nordigen.com/api/v2/requisitions/',
             headers: {
                 'accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQ0NDk1ODczLCJqdGkiOiIyYjZlNjczOTgyNzM0ZmY5OTE2YTdmMzg3ZjljOTE0MyIsImlkIjo0ODc2LCJzZWNyZXRfaWQiOiIwZjE4MDBmNC1kOGNjLTQ0MzctYmEzNy00N2U2MTY2MTQyOTYiLCJhbGxvd2VkX2NpZHJzIjpbIjAuMC4wLjAvMCIsIjo6LzAiXX0.xn0E83FUtSL9_NMWD1Suc9Ornu4bkCTb1RQHnILLh20'
+                'Authorization': `Bearer ${jwt}`
             },
             data: {
                 redirect: "https://www.google.com/",
@@ -53,22 +54,51 @@ const createRequisition = async (bankId: string) => {
             },
         })
 
-        RequisitionId = res.data.id
+        MyAccountID66 = res.data.id
         userBankSignInLink = res.data.link
     }
     catch (e) {
         console.error(e)
     }
 }
+
+
+
+const requestBalance = async () => {
+    try {
+        console.log("HIIIII")
+        let res = await axios({
+            method: 'GET',
+            url: `https://ob.nordigen.com/api/v2/accounts/609c3976-df41-4253-ae1a-6be551db8959/balances/ `,
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${jwt}`
+            }
+        })
+
+       return res.data.balances[0].balanceAmount.amount
+    }
+    catch (e) {
+        console.error(e)
+    }
+}
+
+
 const nordigen = {
-    RequisitionId,
+    RequisitionId: MyAccountID66,
     userBankSignInLink,
     jwt,
     requestJWT,
     selectJWT,
     selectLink,
-    createRequisition
+    createRequisition,
+    requestBalance
 
 }
 
 export default nordigen
+
+
+
+// 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQ0NDk1ODczLCJqdGkiOiIyYjZlNjczOTgyNzM0ZmY5OTE2YTdmMzg3ZjljOTE0MyIsImlkIjo0ODc2LCJzZWNyZXRfaWQiOiIwZjE4MDBmNC1kOGNjLTQ0MzctYmEzNy00N2U2MTY2MTQyOTYiLCJhbGxvd2VkX2NpZHJzIjpbIjAuMC4wLjAvMCIsIjo6LzAiXX0.xn0E83FUtSL9_NMWD1Suc9Ornu4bkCTb1RQHnILLh20'
