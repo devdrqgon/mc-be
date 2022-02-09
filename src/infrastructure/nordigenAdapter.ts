@@ -1,6 +1,6 @@
 
 import axios from 'axios'
-import { v4 as uuidv4, v4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 
 let jwt = 'Bearer  '
 let MyAccountID66 = '609c3976-df41-4253-ae1a-6be551db8959' //NOw hard coded, will be dynamic in prod 
@@ -10,7 +10,7 @@ let userBankSignInLink = 'undef'
 
 const selectJWT = () => jwt
 const selectLink = () => userBankSignInLink
-const selectMyAccountID66  = () => MyAccountID66
+const selectMyAccountID66 = () => MyAccountID66
 const requestJWT = async () => {
     try {
         let res = await axios({
@@ -76,8 +76,9 @@ const requestBalance = async () => {
                 'Authorization': `Bearer ${jwt}`
             }
         })
+        console.log("good job bouhmid, your balance is:" + res.data.balances[0].balanceAmount.amount)
 
-       return res.data.balances[0].balanceAmount.amount
+        return res.data.balances[0].balanceAmount.amount
     }
     catch (e) {
         console.error(e)

@@ -77,7 +77,7 @@ const NordigenTester = async () =>{
     // console.log("good job bouhmid, your balance is:"+ balance)
     // console.log("LINK", nordigen.selectLink())
 } 
-NordigenTester()
+// NordigenTester()
 
 /** Create Server */
 const httpServer = http.createServer(app)
