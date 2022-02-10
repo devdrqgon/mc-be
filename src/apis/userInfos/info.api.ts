@@ -100,7 +100,7 @@ const getOneUserInfo = async (req: Request, res: Response) => {
     //Get Balance Doc 
      await retrieveBalanceDTO(username)
     //Is the balance amount more recent than 24/3 = 8 hours? 
-    const refresh = shouldIRefresh(1, moment().format(), await getLastUpdateTime(username))// '2022-02-10T13:29:23.462+00:00'
+    const refresh = shouldIRefresh(8, moment().format(), await getLastUpdateTime(username))// '2022-02-10T13:29:23.462+00:00'
 
     if (refresh === true) {
         console.log("REFRESHING FROM BANK")
