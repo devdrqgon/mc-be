@@ -38,8 +38,8 @@ const updateBill = (req: Request, res: Response) => {
         .select('accounts')
         .exec()
         .then((accounts) => {
-            balance = accounts[0].balance
-            console.info("accounts",balance)
+            balance = accounts[0].balance // OKAY?? 
+            console.info("accounts",balance) 
         })
         .catch((err) => {
             logging.error("[billsAPI]", err.message, err)

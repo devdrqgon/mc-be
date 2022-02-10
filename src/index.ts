@@ -14,7 +14,7 @@ import billRoutes from "./apis/bills/bill.routes";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
-import { flowSim, getLastUpdateTime, retrieveBalanceDTO, updateBalanceDocument } from "./apis/userInfos/info.api";
+import { flowSim, getLastUpdateTime, retrieveBalanceDTO, updateBalanceDocument, updateBalanceInUserInfoDocument } from "./apis/userInfos/info.api";
 // import nordigen from "./infrastructure/nordigenAdapter";
 
 
@@ -71,7 +71,7 @@ app.use('/bills', billRoutes)
 /** TODO: Error handling */
 
 /** Test Nordigen  */
-const NordigenTester = async () =>{
+const NordigenTester = async () => {
     // await nordigen.requestJWT()
     // await nordigen.createRequisition('KSK_HEILBRONN_HEISDE66XXX')
     // const balance = await nordigen.requestBalance()
@@ -79,10 +79,14 @@ const NordigenTester = async () =>{
     // console.log("LINK", nordigen.selectLink())
     // await retrieveBalanceDoc('amddev')
     // await updateBalanceDocument()
-    console.log("S")
-    const last = await getLastUpdateTime()
-    console.log(last)
-} 
+    // console.log("S")
+    // const last = await getLastUpdateTime('amddev')
+    // console.log(last)
+    // const res = await updateBalanceInUserInfoDocument("1", 'amddev')
+    // console.log("UPDATED USERINFO DOC ::", res)
+    // await flowSim()
+
+}
 NordigenTester()
 
 /** Create Server */

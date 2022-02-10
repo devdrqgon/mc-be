@@ -15,20 +15,6 @@ const getAllUserInfos = (req: Request, res: Response) => {
 }
 
 
-//Create a middleware that verifies if the user Account exists in db
-const getOneUserInfo = async (req: Request, res: Response) => {
-    logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
-    const username = req.params.username as string
-
-    //Get Balance Doc 
-    const beforeUpdateBalanceDoc = await retrieveBalanceDTO(username)
-
-    //Is the balance amount more recent than 24/3 = 8 hours? 
-
-
-
-
-}
 
 
 
@@ -43,8 +29,8 @@ export const shouldIRefresh = (xHours: number, _nowTime: string, _lastUpdateTime
     //FormatDate 
     const formattedLastUpdt = formatDate(_lastUpdateTime)
     const formattedNowTime = formatDate(_nowTime)
-    // console.log("TODAY IS ", formattedNowTime)
-    // console.log("LASTU IS ", formattedLastUpdt)
+    console.log("formattedLastUpdt IS ", formattedLastUpdt)
+    console.log("formattedNowTime IS ", formattedNowTime)
     const duration = moment.duration(formattedNowTime.diff(formattedLastUpdt))
     const hours = duration.asHours()
     const timePassed = parseFloat(hours.toFixed(2))
@@ -54,8 +40,8 @@ export const shouldIRefresh = (xHours: number, _nowTime: string, _lastUpdateTime
 
 }
 
-export const getLastUpdateTime = async () => {
-    const beforeUpdateBalanceDTO = await retrieveBalanceDTO('amddev')
+export const getLastUpdateTime = async (username: string) => {
+    const beforeUpdateBalanceDTO = await retrieveBalanceDTO(username)
     return beforeUpdateBalanceDTO!.updatedAt
 }
 export const retrieveBalanceDTO = async (username: string) => {
@@ -90,15 +76,62 @@ export const flowSim = async () => { //param _username: string
 
     //to check how recent the balance data is
     // 2022-02-10T14:29:23.462+00:00
-    const refresh = shouldIRefresh(976, moment().format(), await getLastUpdateTime())// '2022-02-10T13:29:23.462+00:00'
+    const refresh = shouldIRefresh(1, moment().format(), await getLastUpdateTime('amddev'))// '2022-02-10T13:29:23.462+00:00'
 
     if (refresh === true) {
+        console.log("FAKE REFRESHING FROM BANK")
+        // let access_token = await nordigen.requestJWT()
+        // let newBalance = await nordigen.requestBalance(access_token)
+        // console.log('New Balance received! ::' + newBalance)
+        //Update collection 
+        await updateBalanceDocument('222', 'amddev')
+    }
+    else{
+        console.log("NOT GONNA REFRESH")
+    }
+
+}
+
+//Create a middleware that verifies if the user Account exists in db
+const getOneUserInfo = async (req: Request, res: Response) => {
+    logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
+    const username = req.params.username as string
+
+    //Get Balance Doc 
+     await retrieveBalanceDTO(username)
+    //Is the balance amount more recent than 24/3 = 8 hours? 
+    const refresh = shouldIRefresh(1, moment().format(), await getLastUpdateTime(username))// '2022-02-10T13:29:23.462+00:00'
+
+    if (refresh === true) {
+        console.log("REFRESHING FROM BANK")
         let access_token = await nordigen.requestJWT()
         let newBalance = await nordigen.requestBalance(access_token)
         console.log('New Balance received! ::' + newBalance)
         //Update collection 
-        await updateBalanceDocument(newBalance, 'amddev')
+        await updateBalanceDocument(newBalance, username)
+        await updateBalanceInUserInfoDocument(newBalance, username)
     }
+    else{
+        console.log("NO DB REFRESH REQUIRED; SKIPPING CALLKING THE BANK")
+    }
+     
+
+
+    UserRepo.Info.find({ username })
+        .select('-updatedAt')
+        .select('-createdAt')
+        .select('-_id')
+        .exec()
+        .then((usrInfo) => {
+
+            return res.status(200).json({ usrInfo })
+        })
+        .catch((err) => {
+            logging.error("[userInfoAPI]", err.message, err)
+
+            return res.status(409).json({ message: 'no user info found' })
+        })
+
 }
 
 //CHeck if user exists in db manually 
@@ -108,8 +141,20 @@ export const updateBalanceDocument = async (_amount: string, _username: string) 
     const update = { amount: _amount }
     let doc = await BalanceRepo.Balance.findOneAndUpdate(filter, update, {
         new: true
-    });
+    })
     console.log(doc)
+}
+
+//619ccb47714cfd0cb3bb4136 accId
+export const updateBalanceInUserInfoDocument = async (_amount: string, _username: string) => {
+    const filter = { "username": _username, "accounts.accountType": 'main' }
+    const update = { $set: { "accounts.$.balance": _amount } }
+    let doc = await UserRepo.Info.findOneAndUpdate(filter, update, {
+        new: true
+    })
+    // console.log(doc)
+    return doc
+
 }
 
 const createOneUserInfo = (req: Request, res: Response) => {

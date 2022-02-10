@@ -63,6 +63,7 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
     UserRepo.Account.find({ username })
         .exec()
         .then(users => {
+            console.info("users.length ", users.length )
             //Check that username is found and unique,  TODO: do check that user is unqiue  in register methode!
             if (users.length !== 1) {
                 if (users.length > 1) {
@@ -76,8 +77,8 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
             const user = users[0]
             //alles gut, let s verify password
             bcryptjs.compare(
-                'amddev',
-                'amddev',
+                password,
+                user.password,
                 (error, result) => {
                     if (error) {
                         logging.error(NAMESPACE, `Wrong password::  ${error.message}`, error)
