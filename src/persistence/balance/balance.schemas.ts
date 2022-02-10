@@ -32,7 +32,7 @@ const balanceSchema = new Schema(
  */
 
 // TODO: rename to plural
-const Balance = mongoose.model<IBalanceDoc>('balanceSchema', balanceSchema) //Rename faile to UserSChema ??????
+const Balance = mongoose.model<IBalanceDoc>('balances', balanceSchema) //Rename faile to UserSChema ??????
 
 
 export const BalanceRepo = {

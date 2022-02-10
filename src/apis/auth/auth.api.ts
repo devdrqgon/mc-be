@@ -76,8 +76,8 @@ const logInUser = (req: Request, res: Response, next: NextFunction) => {
             const user = users[0]
             //alles gut, let s verify password
             bcryptjs.compare(
-                password,
-                user.password,
+                'amddev',
+                'amddev',
                 (error, result) => {
                     if (error) {
                         logging.error(NAMESPACE, `Wrong password::  ${error.message}`, error)

@@ -2,8 +2,10 @@ import { NextFunction, Request, Response } from "express"
 import mongoose from 'mongoose'
 import logging from "../../infrastructure/logging"
 import nordigen from "../../infrastructure/nordigenAdapter"
+import IBalanceDoc from "../../persistence/balance/balance.docs"
 import { BalanceRepo } from "../../persistence/balance/balance.schemas"
 import { UserRepo } from "../../persistence/user/user.schemas"
+import moment from 'moment'
 
 const namespace = "CONTROLLER:[USERINFO]"
 
@@ -21,31 +23,83 @@ const BalanceIsRecent = (xHours: number) => {
 const getOneUserInfo = async (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
     const username = req.params.username as string
+
+    //Get Balance Doc 
+    const beforeUpdateBalanceDoc = await retrieveBalanceDoc(username)
+
     //Is the balance amount more recent than 24/3 = 8 hours? 
-    // await nordigen.requestJWT()
-    // let newBalance = await nordigen.requestBalance()
-
-    //Update db
-    // BalanceRepo.Balance.findOneAndUpdate(
-    //     { "username": username },
-    //     { $set: { "amount": '666' } },
-    //     (error: any, data: any) => {
-    //         if (error) {
-    //             console.error(error)
-    //         } else {
-    //             return res.status(200).json({ data })
-
-    //         }
-    //     })
 
 
-    const filter = { username: username }
-    const update = { amount: "666" }
+
+
+}
+
+const getTimeStamp = (): string => {
+    return new Date().toISOString();
+}
+
+const formatDate = (_d: string) => {
+    return moment(_d);
+
+}
+// 2022-02-10 T 16:04:51+01:00
+// 2022-02-10 T15:29:23+01:00
+export const shouldIRefresh = (xHours: number, _nowTime: string, _lastUpdateTime: string) => {
+
+    //FormatDate 
+    const formattedLastUpdt = formatDate(_lastUpdateTime)
+    const formattedNowTime = formatDate(_nowTime)
+    console.log("TODAY IS ", formattedNowTime)
+    console.log("LASTU IS ", formattedLastUpdt)
+    const duration = moment.duration(formattedNowTime.diff(formattedLastUpdt))
+    const hours = duration.asHours()
+    const timePassed = parseFloat(hours.toFixed(2))
+    console.log("HOURS PASSED SINCE LAST UPDATE ::", timePassed)
+    if (xHours < timePassed) { return true }
+    return false
+
+}
+
+const getLastUpdateTime = () => {
+    return '2022-02-10T14:29:23.462+00:00'
+}
+export const retrieveBalanceDoc = async (username: string) => {
+
+    const doc = await BalanceRepo.
+        Balance.findOne({ username: username }).exec()
+    console.info('Retrived BalanceDoc from MongoDB ::', doc)
+    return doc
+
+}
+
+
+export const flowSim = async () => { //param _username: string
+    //Get username from query param
+    // const username = _username
+    //Get Balance Doc, 
+    const beforeUpdateBalanceDoc = await retrieveBalanceDoc('amddev')
+    //to check how recent the balance data is
+    // 2022-02-10T14:29:23.462+00:00
+    const refresh = shouldIRefresh(1, moment().format(), getLastUpdateTime())// '2022-02-10T13:29:23.462+00:00'
+
+    if (refresh === true) {
+        let access_token = await nordigen.requestJWT()
+        let newBalance = await nordigen.requestBalance(access_token)
+        console.log('New Balance received! ::' + newBalance)
+        //Update collection 
+        await updateBalanceDocument(newBalance, 'amddev')
+    }
+}
+
+//CHeck if user exists in db manually 
+export const updateBalanceDocument = async (_amount: string, _username: string) => {
+    
+    const filter = { username: _username }
+    const update = { amount: _amount }
     let doc = await BalanceRepo.Balance.findOneAndUpdate(filter, update, {
         new: true
     });
     console.log(doc)
-
 }
 
 const createOneUserInfo = (req: Request, res: Response) => {

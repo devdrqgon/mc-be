@@ -26,6 +26,7 @@ const requestJWT = async () => {
         })
         //    console.log(res)
         jwt = res.data.access
+        return res.data.access
         //    console.log(jwt)
     }
     catch (e) {
@@ -64,16 +65,17 @@ const createRequisition = async (bankId: string) => {
 
 
 
-const requestBalance = async () => {
+const requestBalance = async (_jwt: string) => {
     try {
-        console.log("HIIIII")
+        let bearerJwt = `Bearer ${_jwt}`
+        console.log(`Bearer ${_jwt}`)
         let res = await axios({
             method: 'GET',
             url: `https://ob.nordigen.com/api/v2/accounts/609c3976-df41-4253-ae1a-6be551db8959/balances/ `,
             headers: {
                 'accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${jwt}`
+                'Authorization': bearerJwt
             }
         })
         console.log("good job bouhmid, your balance is:" + res.data.balances[0].balanceAmount.amount)

@@ -14,7 +14,8 @@ import billRoutes from "./apis/bills/bill.routes";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
-import nordigen from "./infrastructure/nordigenAdapter";
+import { flowSim, retrieveBalanceDoc, updateBalanceDocument } from "./apis/userInfos/info.api";
+// import nordigen from "./infrastructure/nordigenAdapter";
 
 
 const NAMESPACE = 'Server'
@@ -76,8 +77,12 @@ const NordigenTester = async () =>{
     // const balance = await nordigen.requestBalance()
     // console.log("good job bouhmid, your balance is:"+ balance)
     // console.log("LINK", nordigen.selectLink())
+    // await retrieveBalanceDoc('amddev')
+    // await updateBalanceDocument()
+    console.log("S")
+    await flowSim()
 } 
-// NordigenTester()
+NordigenTester()
 
 /** Create Server */
 const httpServer = http.createServer(app)
