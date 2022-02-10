@@ -13,19 +13,15 @@ const getAllUserInfos = (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get all UserInfos..", req.body)
 
 }
-const BalanceIsRecent = (xHours: number) => {
-    let isRecent = true
-    // Get updatedAt Field from MongoDb of the field Balance 
 
-    return isRecent
-}
+
 //Create a middleware that verifies if the user Account exists in db
 const getOneUserInfo = async (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
     const username = req.params.username as string
 
     //Get Balance Doc 
-    const beforeUpdateBalanceDoc = await retrieveBalanceDoc(username)
+    const beforeUpdateBalanceDoc = await retrieveBalanceDTO(username)
 
     //Is the balance amount more recent than 24/3 = 8 hours? 
 
@@ -34,9 +30,7 @@ const getOneUserInfo = async (req: Request, res: Response) => {
 
 }
 
-const getTimeStamp = (): string => {
-    return new Date().toISOString();
-}
+
 
 const formatDate = (_d: string) => {
     return moment(_d);
@@ -49,8 +43,8 @@ export const shouldIRefresh = (xHours: number, _nowTime: string, _lastUpdateTime
     //FormatDate 
     const formattedLastUpdt = formatDate(_lastUpdateTime)
     const formattedNowTime = formatDate(_nowTime)
-    console.log("TODAY IS ", formattedNowTime)
-    console.log("LASTU IS ", formattedLastUpdt)
+    // console.log("TODAY IS ", formattedNowTime)
+    // console.log("LASTU IS ", formattedLastUpdt)
     const duration = moment.duration(formattedNowTime.diff(formattedLastUpdt))
     const hours = duration.asHours()
     const timePassed = parseFloat(hours.toFixed(2))
@@ -60,27 +54,43 @@ export const shouldIRefresh = (xHours: number, _nowTime: string, _lastUpdateTime
 
 }
 
-const getLastUpdateTime = () => {
-    return '2022-02-10T14:29:23.462+00:00'
+export const getLastUpdateTime = async () => {
+    const beforeUpdateBalanceDTO = await retrieveBalanceDTO('amddev')
+    return beforeUpdateBalanceDTO!.updatedAt
 }
-export const retrieveBalanceDoc = async (username: string) => {
+export const retrieveBalanceDTO = async (username: string) => {
 
-    const doc = await BalanceRepo.
+    const doc: any = await BalanceRepo.
         Balance.findOne({ username: username }).exec()
     console.info('Retrived BalanceDoc from MongoDB ::', doc)
-    return doc
+
+    const BalanceDTO: BalanceDocResult = {
+        _id: doc._id,
+        amount: doc.amount,
+        username: doc.username,
+        createdAt: doc.createdAt,
+        updatedAt: doc.updatedAt
+    }
+    return BalanceDTO
 
 }
 
+interface BalanceDocResult {
+    _id: any,
+    amount: string,
+    username: string,
+    createdAt: string,
+    updatedAt: string
+}
 
 export const flowSim = async () => { //param _username: string
     //Get username from query param
     // const username = _username
     //Get Balance Doc, 
-    const beforeUpdateBalanceDoc = await retrieveBalanceDoc('amddev')
+
     //to check how recent the balance data is
     // 2022-02-10T14:29:23.462+00:00
-    const refresh = shouldIRefresh(1, moment().format(), getLastUpdateTime())// '2022-02-10T13:29:23.462+00:00'
+    const refresh = shouldIRefresh(976, moment().format(), await getLastUpdateTime())// '2022-02-10T13:29:23.462+00:00'
 
     if (refresh === true) {
         let access_token = await nordigen.requestJWT()
@@ -93,7 +103,7 @@ export const flowSim = async () => { //param _username: string
 
 //CHeck if user exists in db manually 
 export const updateBalanceDocument = async (_amount: string, _username: string) => {
-    
+
     const filter = { username: _username }
     const update = { amount: _amount }
     let doc = await BalanceRepo.Balance.findOneAndUpdate(filter, update, {

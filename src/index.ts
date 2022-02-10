@@ -14,7 +14,7 @@ import billRoutes from "./apis/bills/bill.routes";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
-import { flowSim, retrieveBalanceDoc, updateBalanceDocument } from "./apis/userInfos/info.api";
+import { flowSim, getLastUpdateTime, retrieveBalanceDTO, updateBalanceDocument } from "./apis/userInfos/info.api";
 // import nordigen from "./infrastructure/nordigenAdapter";
 
 
@@ -80,7 +80,8 @@ const NordigenTester = async () =>{
     // await retrieveBalanceDoc('amddev')
     // await updateBalanceDocument()
     console.log("S")
-    await flowSim()
+    const last = await getLastUpdateTime()
+    console.log(last)
 } 
 NordigenTester()
 
