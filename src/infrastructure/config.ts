@@ -3,12 +3,14 @@ import dotenv from 'dotenv';
 import { ConnectOptions } from 'mongoose';
 import mongoose from 'mongoose'
 import logging from './logging';
+import NordigenClient from './nordigenAdapter';
+
 dotenv.config();
 
 export enum namespaces {
-    infrastructure="infra",
-    persistence ="persistence",
-    api ="api"
+    infrastructure = "infra",
+    persistence = "persistence",
+    api = "api"
 
 }
 const MONGO_OPTIONS: ConnectOptions = {
@@ -29,6 +31,7 @@ const MONGO = {
     options: MONGO_OPTIONS,
     url: `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
 }
+
 
 
 const SERVER_HOSTNAME = process.env.SERVER_HOSTNAME || 'localhost'
@@ -55,7 +58,8 @@ const SERVER = {
 const config = {
     mongo: MONGO,
     server: SERVER,
-    connectDB
+    connectDB,
+    NordigenClient
 };
 
 

@@ -128,7 +128,7 @@ const userInfoWithSalarySchema = new Schema(
  */
 
 // TODO: rename to plural
-const Account = mongoose.model<IUserDoc>('UserAccount', userAccountSchema) //Rename faile to UserSChema ??????
+const Account = mongoose.model<IUserDoc>('userAccountSchema', userAccountSchema) //Rename faile to UserSChema ??????
 const Info = mongoose.model('userInfoSchema', userInfoWithSalarySchema) //Rename faile to UserSChema ??????
 
 
