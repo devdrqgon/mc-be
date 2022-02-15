@@ -18,17 +18,13 @@ const getAllUserInfos = (req: Request, res: Response) => {
 
 
 
-const formatDate = (_d: string) => {
-    return moment(_d);
-
-}
 // 2022-02-10 T 16:04:51+01:00
 // 2022-02-10 T15:29:23+01:00
 export const shouldIRefresh = (xHours: number, _nowTime: string, _lastUpdateTime: string) => {
 
     //FormatDate 
-    const formattedLastUpdt = formatDate(_lastUpdateTime)
-    const formattedNowTime = formatDate(_nowTime)
+    const formattedLastUpdt = moment(_lastUpdateTime)
+    const formattedNowTime = moment(_nowTime)
     console.log("formattedLastUpdt IS ", formattedLastUpdt)
     console.log("formattedNowTime IS ", formattedNowTime)
     const duration = moment.duration(formattedNowTime.diff(formattedLastUpdt))
