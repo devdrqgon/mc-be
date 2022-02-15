@@ -86,7 +86,7 @@ export const flowSim = async () => { //param _username: string
         //Update collection 
         await updateBalanceDocument('222', 'amddev')
     }
-    else{
+    else {
         console.log("NOT GONNA REFRESH")
     }
 
@@ -97,24 +97,22 @@ const getOneUserInfo = async (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
     const username = req.params.username as string
 
-    //Get Balance Doc 
-     await retrieveBalanceDTO(username)
     //Is the balance amount more recent than 24/3 = 8 hours? 
     const refresh = shouldIRefresh(8, moment().format(), await getLastUpdateTime(username))// '2022-02-10T13:29:23.462+00:00'
 
-    if (refresh === true) {
-        console.log("REFRESHING FROM BANK")
-        let access_token = await nordigen.requestJWT()
-        let newBalance = await nordigen.requestBalance(access_token)
-        console.log('New Balance received! ::' + newBalance)
-        //Update collection 
-        await updateBalanceDocument(newBalance, username)
-        await updateBalanceInUserInfoDocument(newBalance, username)
-    }
-    else{
-        console.log("NO DB REFRESH REQUIRED; SKIPPING CALLKING THE BANK")
-    }
-     
+    // if (refresh === true) {
+    //     console.log("REFRESHING FROM BANK")
+    //     let access_token = await nordigen.requestJWT()
+    //     let newBalance = await nordigen.requestBalance(access_token)
+    //     console.log('New Balance received! ::' + newBalance)
+    //     //Update collection 
+    //     await updateBalanceDocument(newBalance, username)
+    //     await updateBalanceInUserInfoDocument(newBalance, username)
+    // }
+    // else{
+    //     console.log("NO DB REFRESH REQUIRED; SKIPPING CALLKING THE BANK")
+    // }
+
 
 
     UserRepo.Info.find({ username })
@@ -246,3 +244,59 @@ export default {
 //             }
 //         })
 // }   
+
+const periodLength = 5 //days
+const DailyBudget = (nbrOfDays: number, moneyAvailable: number) => {
+    return moneyAvailable / nbrOfDays
+}
+
+
+const BudgetPerPeriod = (nbrOfDays: number,moneyAvailable: number) => {
+    return DailyBudget(nbrOfDays, moneyAvailable) * periodLength
+}
+
+/**
+ * 
+ * we divide the length of the survival mission in periods, so that we have  milestones 
+ * 
+ */
+const NbrOfPeriods = (nbrOfDays: number) => {
+    if( nbrOfDays / periodLength )
+    return nbrOfDays / periodLength 
+}
+
+const MoneyLowerBound = (nbOfRemainingDays : number, dailyBudget:number)=> {
+    return dailyBudget * nbOfRemainingDays
+
+}
+const isTheMoneyEnough = (dailyBudget : number, moneyAvailable : number, nbOfRemainingDays : number) => {
+   // Maybe we add ma7zou9DailyBudget, ma7loul daily Budget.. 
+
+   //Current money (moneyAvailable) should always be greater than MoneyLowerBound
+    let _moneyLowerBound = MoneyLowerBound(nbOfRemainingDays,dailyBudget)
+    if(_moneyLowerBound > moneyAvailable){
+        return false
+    }
+    return true
+
+}
+
+const canISaveXEur = (XEur:number ,nbOfRemainingDays : number, dailyBudget:number,  moneyAvailable : number)=> {
+    let _moneyLowerBound = MoneyLowerBound(nbOfRemainingDays,dailyBudget)
+
+    if(_moneyLowerBound < (moneyAvailable + XEur)){
+        return true 
+    }
+    return false
+}
+//MC must remind user to not exceed period budget
+
+/**
+ * 
+ * as a user i want to create a goal 
+ * 
+ * i want to survive with 2700 till 31 March 
+ *  MC: your DailyBudget()
+ * 
+ * 
+ */
