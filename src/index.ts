@@ -85,7 +85,7 @@ const NordigenTester = async () => {
     // const res = await updateBalanceInUserInfoDocument("1", 'amddev')
     // console.log("UPDATED USERINFO DOC ::", res)
     // await flowSim()
-
+    // await flowSim()
 }
 NordigenTester()
 

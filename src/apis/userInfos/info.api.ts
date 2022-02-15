@@ -37,8 +37,13 @@ export const shouldIRefresh = (xHours: number, _nowTime: string, _lastUpdateTime
 }
 
 export const getLastUpdateTime = async (username: string) => {
+
     const beforeUpdateBalanceDTO = await retrieveBalanceDTO(username)
-    return beforeUpdateBalanceDTO!.updatedAt
+    if (beforeUpdateBalanceDTO !== null) {
+        return beforeUpdateBalanceDTO!.updatedAt
+    }
+    console.error("getLastUpdateTime returned null")
+    return null
 }
 export const retrieveBalanceDTO = async (username: string) => {
 
@@ -46,14 +51,18 @@ export const retrieveBalanceDTO = async (username: string) => {
         Balance.findOne({ username: username }).exec()
     console.info('Retrived BalanceDoc from MongoDB ::', doc)
 
-    const BalanceDTO: BalanceDocResult = {
-        _id: doc._id,
-        amount: doc.amount,
-        username: doc.username,
-        createdAt: doc.createdAt,
-        updatedAt: doc.updatedAt
+    if (doc === null) {
+        return null
+    } else {
+        const BalanceDTO: BalanceDocResult = {
+            _id: doc._id,
+            amount: doc.amount,
+            username: doc.username,
+            createdAt: doc.createdAt,
+            updatedAt: doc.updatedAt
+        }
+        return BalanceDTO
     }
-    return BalanceDTO
 
 }
 
@@ -67,20 +76,22 @@ interface BalanceDocResult {
 
 export const flowSim = async () => { //param _username: string
     //Get username from query param
-    // const username = _username
+    const username = "amddev"
     //Get Balance Doc, 
 
     //to check how recent the balance data is
     // 2022-02-10T14:29:23.462+00:00
-    const refresh = shouldIRefresh(1, moment().format(), await getLastUpdateTime('amddev'))// '2022-02-10T13:29:23.462+00:00'
+    const lstUpdateTime = await getLastUpdateTime('amddev')
+    const refresh = shouldIRefresh(1, moment().format(), lstUpdateTime!)// '2022-02-10T13:29:23.462+00:00'
 
     if (refresh === true) {
-        console.log("FAKE REFRESHING FROM BANK")
-        // let access_token = await nordigen.requestJWT()
-        // let newBalance = await nordigen.requestBalance(access_token)
-        // console.log('New Balance received! ::' + newBalance)
+        console.log("REFRESHING FROM BANK")
+        let access_token = await nordigen.requestJWT()
+        let newBalance = await nordigen.requestBalance(access_token)
+        console.log('New Balance received! ::' + newBalance)
         //Update collection 
-        await updateBalanceDocument('222', 'amddev')
+        await updateBalanceDocument(newBalance, username)
+        await updateBalanceInUserInfoDocument(newBalance, username)
     }
     else {
         console.log("NOT GONNA REFRESH")
@@ -93,9 +104,8 @@ const getOneUserInfo = async (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
     const username = req.params.username as string
 
-    //Is the balance amount more recent than 24/3 = 8 hours? 
-    const refresh = shouldIRefresh(8, moment().format(), await getLastUpdateTime(username))// '2022-02-10T13:29:23.462+00:00'
-
+    const lstUpdateTime = await getLastUpdateTime('amddev')
+    const refresh = shouldIRefresh(8, moment().format(), lstUpdateTime!)
     // if (refresh === true) {
     //     console.log("REFRESHING FROM BANK")
     //     let access_token = await nordigen.requestJWT()
@@ -247,7 +257,7 @@ const DailyBudget = (nbrOfDays: number, moneyAvailable: number) => {
 }
 
 
-const BudgetPerPeriod = (nbrOfDays: number,moneyAvailable: number) => {
+const BudgetPerPeriod = (nbrOfDays: number, moneyAvailable: number) => {
     return DailyBudget(nbrOfDays, moneyAvailable) * periodLength
 }
 
@@ -257,31 +267,31 @@ const BudgetPerPeriod = (nbrOfDays: number,moneyAvailable: number) => {
  * 
  */
 const NbrOfPeriods = (nbrOfDays: number) => {
-    if( nbrOfDays / periodLength )
-    return nbrOfDays / periodLength 
+    if (nbrOfDays / periodLength)
+        return nbrOfDays / periodLength
 }
 
-const MoneyLowerBound = (nbOfRemainingDays : number, dailyBudget:number)=> {
+const MoneyLowerBound = (nbOfRemainingDays: number, dailyBudget: number) => {
     return dailyBudget * nbOfRemainingDays
 
 }
-const isTheMoneyEnough = (dailyBudget : number, moneyAvailable : number, nbOfRemainingDays : number) => {
-   // Maybe we add ma7zou9DailyBudget, ma7loul daily Budget.. 
+const isTheMoneyEnough = (dailyBudget: number, moneyAvailable: number, nbOfRemainingDays: number) => {
+    // Maybe we add ma7zou9DailyBudget, ma7loul daily Budget.. 
 
-   //Current money (moneyAvailable) should always be greater than MoneyLowerBound
-    let _moneyLowerBound = MoneyLowerBound(nbOfRemainingDays,dailyBudget)
-    if(_moneyLowerBound > moneyAvailable){
+    //Current money (moneyAvailable) should always be greater than MoneyLowerBound
+    let _moneyLowerBound = MoneyLowerBound(nbOfRemainingDays, dailyBudget)
+    if (_moneyLowerBound > moneyAvailable) {
         return false
     }
     return true
 
 }
 
-const canISaveXEur = (XEur:number ,nbOfRemainingDays : number, dailyBudget:number,  moneyAvailable : number)=> {
-    let _moneyLowerBound = MoneyLowerBound(nbOfRemainingDays,dailyBudget)
+const canISaveXEur = (XEur: number, nbOfRemainingDays: number, dailyBudget: number, moneyAvailable: number) => {
+    let _moneyLowerBound = MoneyLowerBound(nbOfRemainingDays, dailyBudget)
 
-    if(_moneyLowerBound < (moneyAvailable + XEur)){
-        return true 
+    if (_moneyLowerBound < (moneyAvailable + XEur)) {
+        return true
     }
     return false
 }
