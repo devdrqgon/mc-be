@@ -32,21 +32,7 @@ const updateBill = (req: Request, res: Response) => {
         when: reqWhen, paid: reqPaid,
         billName: reqBillName
     } = req.body
-    let balance = 0
-    //get balance
-    UserRepo.Info.find({ username })
-        .select('accounts')
-        .exec()
-        .then((accounts) => {
-            balance = accounts[0].balance // OKAY?? 
-            console.info("accounts",balance) 
-        })
-        .catch((err) => {
-            logging.error("[billsAPI]", err.message, err)
-
-            return res.status(409).json({ message: 'get bills error' })
-        })
-
+    
     UserRepo.Info.findOneAndUpdate(
         { "username": username, "bills._id": billId },
         { $set: { "bills.$.paid": reqPaid } },
