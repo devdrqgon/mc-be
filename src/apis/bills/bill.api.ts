@@ -47,6 +47,24 @@ const updateBill = (req: Request, res: Response) => {
 
 }
 
+const getAllBillsOfOneUserInADuration = async (req: Request, res: Response) => {
+    const beginDate = req.params.beginDate as string
+    const endDate =req.params.endDate as string
+    const username =req.params.username as string
+
+    //get user bills 
+    const bills = await  getBillsOfUserFromDB(username)
+
+    //calculate sum
+    
+    const sum =  calculateSum(bills!)
+    const dto = {
+        sum
+    }
+    return res.status(200).json(dto)
+
+}
+
 export default {
     updateBill,
     getAllBillsOfOneUser,
@@ -55,6 +73,26 @@ export default {
 
 
 
+
+function getBillsOfUserFromDB(username: string) {
+    return UserRepo.Info.find({ username })
+        .select('bills')
+        .exec()
+        .then((bills) => {
+            console.log(bills)
+            return bills as Bill[];
+        })
+        .catch((err) => {
+            logging.error("[billsAPI]", err.message, err);
+
+            return null;
+        });
+}
+
+function calculateSum(bills: Bill[]) {
+    // throw new Error("Function not implemented.");
+
+}
 // Leftovers
     //find user by its id, update its post with what's in req.body
     // UserRepo.Info.findOneAndUpdate(
