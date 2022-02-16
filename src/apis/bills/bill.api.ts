@@ -72,9 +72,11 @@ export default {
 
 
 
+export function testy(){
+    return "a"
+}
 
-
-function getBillsOfUserFromDB(username: string) {
+export function getBillsOfUserFromDB(username: string) {
     return UserRepo.Info.find({ username })
         .select('bills')
         .exec()
