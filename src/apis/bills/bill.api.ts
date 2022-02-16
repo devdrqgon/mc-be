@@ -1,4 +1,4 @@
- import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import mongoose from 'mongoose'
 import { userInfo } from "os";
 import { Bill } from "../../domain/user.domain";
@@ -32,7 +32,7 @@ const updateBill = (req: Request, res: Response) => {
         when: reqWhen, paid: reqPaid,
         billName: reqBillName
     } = req.body
-    
+
     UserRepo.Info.findOneAndUpdate(
         { "username": username, "bills._id": billId },
         { $set: { "bills.$.paid": reqPaid } },
@@ -49,15 +49,15 @@ const updateBill = (req: Request, res: Response) => {
 
 const getAllBillsOfOneUserInADuration = async (req: Request, res: Response) => {
     const beginDate = req.params.beginDate as string
-    const endDate =req.params.endDate as string
-    const username =req.params.username as string
+    const endDate = req.params.endDate as string
+    const username = req.params.username as string
 
     //get user bills 
-    const bills = await  getBillsOfUserFromDB(username)
+    const bills = await getBillsOfUserFromDB(username)
 
     //calculate sum
-    
-    const sum =  calculateSum(bills!)
+
+    const sum = calculateSum(bills!)
     const dto = {
         sum
     }
@@ -72,23 +72,26 @@ export default {
 
 
 
-export function testy(){
+export function testy() {
     return "a"
 }
 
-export function getBillsOfUserFromDB(username: string) {
-    return UserRepo.Info.find({ username })
+export const getBillsOfUserFromDB = async (username: string) => {
+    const bills = await UserRepo.Info.find({ username })
         .select('bills')
         .exec()
-        .then((bills) => {
-            console.log(bills)
-            return bills as Bill[];
+        .then((bills: any) => {
+            //  console.info(bills)
+            return bills;
         })
         .catch((err) => {
             logging.error("[billsAPI]", err.message, err);
 
             return null;
-        });
+        })
+    return bills[0].bills
+
+
 }
 
 function calculateSum(bills: Bill[]) {

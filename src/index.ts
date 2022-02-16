@@ -15,6 +15,7 @@ import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
 import { flowSim, getLastUpdateTime, retrieveBalanceDTO, updateBalanceDocument, updateBalanceInUserInfoDocument } from "./apis/userInfos/info.api";
+import { getBillsOfUserFromDB } from "./apis/bills/bill.api";
 // import nordigen from "./infrastructure/nordigenAdapter";
 
 
@@ -86,6 +87,9 @@ const NordigenTester = async () => {
     // console.log("UPDATED USERINFO DOC ::", res)
     // await flowSim()
     // await flowSim()
+    const bills = await getBillsOfUserFromDB('amddev')
+    console.info("Your are BILLS", bills)
+
 }
 NordigenTester()
 
