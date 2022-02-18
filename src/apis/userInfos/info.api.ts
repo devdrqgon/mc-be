@@ -6,6 +6,7 @@ import IBalanceDoc from "../../persistence/balance/balance.docs"
 import { BalanceRepo } from "../../persistence/balance/balance.schemas"
 import { UserRepo } from "../../persistence/user/user.schemas"
 import moment from 'moment'
+import { GetSumBillsInADuration } from "../bills/bill.api"
 
 const namespace = "CONTROLLER:[USERINFO]"
 
@@ -44,6 +45,66 @@ export const getLastUpdateTime = async (username: string) => {
     }
     console.error("getLastUpdateTime returned null")
     return null
+}
+export const retrieveInfoDTO = async (username: string) => {
+    const start = moment({
+        year: moment().year(),
+        month: moment().month(),
+        day: moment().date(),
+    })
+    const end = moment({
+        year: 2022,
+        month: 2,
+        day: 30
+    })
+    const doc: any = await UserRepo.
+        Info.findOne({ username: username }).exec()
+    // console.info('Retrived infoDoc from MongoDB ::', doc)
+
+    if (doc === null) {
+        return null
+    } else {
+       const lean= await getLean(username,doc.accounts[0].balance,start,end)
+       const days=countDaysDifference(start, end)
+       const Gasdebt = 290 - 230
+
+        const InfoDTO: UserInfoResultDoc = {
+            _id: doc._id,
+            nextIncome: {
+                amount: doc.salary.amount,
+                daysleft: days
+            },
+            balance: {
+                gross: doc.accounts[0].balance,
+                netto: lean
+            },
+            maxPerDay: (lean - Gasdebt) / days
+        }
+        return InfoDTO
+    }
+
+}
+export const getLean = async (username: string, grossBalance: number, start: moment.Moment, end: moment.Moment) => {
+    const res = await GetSumBillsInADuration(username, start, end)
+    return grossBalance- res 
+}
+export const countDaysDifference = (beginDate: moment.Moment, endDate: moment.Moment
+) => {
+    const duration = moment.duration(endDate.add(1, 'day').diff(beginDate))
+    // console.info("Diff", duration.asDays())
+    return Math.round(duration.asDays())
+}
+interface UserInfoResultDoc {
+    _id: string,
+    nextIncome: {
+        amount: number,
+        daysleft: number
+    },
+    balance: {
+        gross: number,
+        netto: number
+    },
+    maxPerDay: number
 }
 export const retrieveBalanceDTO = async (username: string) => {
 
@@ -99,6 +160,13 @@ export const flowSim = async () => { //param _username: string
 
 }
 
+export const getBalanceLean= async ()=>{
+    let access_token = await nordigen.requestJWT()
+    let newBalance = await nordigen.requestBalance(access_token)
+    
+    return newBalance
+}
+
 //Create a middleware that verifies if the user Account exists in db
 const getOneUserInfo = async (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
@@ -120,21 +188,29 @@ const getOneUserInfo = async (req: Request, res: Response) => {
     // }
 
 
+    const dto = await retrieveInfoDTO(username)
 
-    UserRepo.Info.find({ username })
-        .select('-updatedAt')
-        .select('-createdAt')
-        .select('-_id')
-        .exec()
-        .then((usrInfo) => {
+    console.info("User new info", dto)
 
-            return res.status(200).json({ usrInfo })
-        })
-        .catch((err) => {
-            logging.error("[userInfoAPI]", err.message, err)
 
-            return res.status(409).json({ message: 'no user info found' })
-        })
+
+    return res.status(200).json(dto)
+
+
+    // const dbInfo = UserRepo.Info.find({ username })
+    //     .select('-updatedAt')
+    //     .select('-createdAt')
+    //     .select('-_id')
+    //     .exec()
+    //     .then((usrInfo) => {
+
+    //         return res.status(200).json({ usrInfo })
+    //     })
+    //     .catch((err) => {
+    //         logging.error("[userInfoAPI]", err.message, err)
+
+    //         return res.status(409).json({ message: 'no user info found' })
+    //     })
 
 }
 

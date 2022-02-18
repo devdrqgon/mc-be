@@ -99,6 +99,7 @@ export const GetSumBillsInADuration = async (username: string,start: moment.Mome
     const sum = calculateSum(analyzedBillS)
 
     console.info("Sum of Bills::",sum)
+    return sum
 }
 interface AnalyzedBill {
     idRef: string,

@@ -14,7 +14,7 @@ import billRoutes from "./apis/bills/bill.routes";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
-import { flowSim, getLastUpdateTime, retrieveBalanceDTO, updateBalanceDocument, updateBalanceInUserInfoDocument } from "./apis/userInfos/info.api";
+import { flowSim, getBalanceLean, getLastUpdateTime, retrieveBalanceDTO, retrieveInfoDTO, updateBalanceDocument, updateBalanceInUserInfoDocument } from "./apis/userInfos/info.api";
 import { getBillsOfUserFromDB, getReccurenceBill2, GetSumBillsInADuration } from "./apis/bills/bill.api";
 import moment from "moment";
 // import nordigen from "./infrastructure/nordigenAdapter";
@@ -88,19 +88,23 @@ const NordigenTester = async () => {
     // console.log("UPDATED USERINFO DOC ::", res)
     // await flowSim()
     // await flowSim()
-    const start = moment({
-        year: moment().year(),
-        month: moment().month(),
-        day: moment().date(),
-    })
+    // const start = moment({
+    //     year: moment().year(),
+    //     month: moment().month(),
+    //     day: moment().date(),
+    // })
  
-    const end = moment({
-        year: 2022,
-        month: 2,
-        day: 30 
-    })
-    GetSumBillsInADuration('amddev',start,end)
+    // const end = moment({
+    //     year: 2022,
+    //     month: 2,
+    //     day: 30 
+    // })
+    // // GetSumBillsInADuration('amddev',start,end)
+    // // retrieveInfoDTO('amddev')
+    // const dto = await retrieveInfoDTO('amddev')
 
+    // console.info("User new info",dto)
+    await getBalanceLean()
 }
 NordigenTester()
 const recurrenceTester = () => {
