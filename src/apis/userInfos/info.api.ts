@@ -66,8 +66,10 @@ export const retrieveInfoDTO = async (username: string) => {
     } else {
        const lean= await getLean(username,doc.accounts[0].balance,start,end)
        const days=countDaysDifference(start, end)
-       const Gasdebt = 290 - 230
-
+       const Gasdebt = 290 - 230 //decrease dao from 330 to 100 , so debt is 60
+       const safetyBuffer = 100
+       const transport = 22*3
+       const myTaxes = Gasdebt + safetyBuffer + transport
         const InfoDTO: UserInfoResultDoc = {
             _id: doc._id,
             nextIncome: {
@@ -76,9 +78,9 @@ export const retrieveInfoDTO = async (username: string) => {
             },
             balance: {
                 gross: doc.accounts[0].balance,
-                netto: lean
+                netto: lean - myTaxes
             },
-            maxPerDay: (lean - Gasdebt) / days
+            maxPerDay: (lean - myTaxes) / days
         }
         return InfoDTO
     }
@@ -174,18 +176,18 @@ const getOneUserInfo = async (req: Request, res: Response) => {
 
     const lstUpdateTime = await getLastUpdateTime('amddev')
     const refresh = shouldIRefresh(8, moment().format(), lstUpdateTime!)
-    // if (refresh === true) {
-    //     console.log("REFRESHING FROM BANK")
-    //     let access_token = await nordigen.requestJWT()
-    //     let newBalance = await nordigen.requestBalance(access_token)
-    //     console.log('New Balance received! ::' + newBalance)
-    //     //Update collection 
-    //     await updateBalanceDocument(newBalance, username)
-    //     await updateBalanceInUserInfoDocument(newBalance, username)
-    // }
-    // else{
-    //     console.log("NO DB REFRESH REQUIRED; SKIPPING CALLKING THE BANK")
-    // }
+    if (refresh === true) {
+        console.log("REFRESHING FROM BANK")
+        let access_token = await nordigen.requestJWT()
+        let newBalance = await nordigen.requestBalance(access_token)
+        console.log('New Balance received! ::' + newBalance)
+        //Update collection 
+        await updateBalanceDocument(newBalance, username)
+        await updateBalanceInUserInfoDocument(newBalance, username)
+    }
+    else{
+        console.log("NO DB REFRESH REQUIRED; SKIPPING CALLKING THE BANK")
+    }
 
 
     const dto = await retrieveInfoDTO(username)
