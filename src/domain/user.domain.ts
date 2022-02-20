@@ -87,16 +87,14 @@ export class userPersonalInfos {
     }
 }
 
-export class Bill {
-    id: string
+export interface Bill {
+    _id: string
+    cost: number,
+    billName: string,
+    username: string,
+    paid: boolean,
+    when: number
 
-    constructor(sum: number,
-        billName: number,
-        username: string,
-        paid: boolean,
-        when: number) {
-        this.id = uuidv4()
-    }
 }
 export class SalaryInfo {
     amount: number

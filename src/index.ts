@@ -14,7 +14,9 @@ import billRoutes from "./apis/bills/bill.routes";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
-import { flowSim, getLastUpdateTime, retrieveBalanceDTO, updateBalanceDocument, updateBalanceInUserInfoDocument } from "./apis/userInfos/info.api";
+import { flowSim, getBalanceLean, getLastUpdateTime, retrieveBalanceDTO, retrieveInfoDTO, updateBalanceDocument, updateBalanceInUserInfoDocument } from "./apis/userInfos/info.api";
+import { getBillsOfUserFromDB, getReccurenceBill2, GetSumBillsInADuration } from "./apis/bills/bill.api";
+import moment from "moment";
 // import nordigen from "./infrastructure/nordigenAdapter";
 
 
@@ -86,9 +88,44 @@ const NordigenTester = async () => {
     // console.log("UPDATED USERINFO DOC ::", res)
     // await flowSim()
     // await flowSim()
+    // const start = moment({
+    //     year: moment().year(),
+    //     month: moment().month(),
+    //     day: moment().date(),
+    // })
+ 
+    // const end = moment({
+    //     year: 2022,
+    //     month: 2,
+    //     day: 30 
+    // })
+    // // GetSumBillsInADuration('amddev',start,end)
+    // // retrieveInfoDTO('amddev')
+    // const dto = await retrieveInfoDTO('amddev')
+
+    // console.info("User new info",dto)
+    await getBalanceLean()
 }
 NordigenTester()
+const recurrenceTester = () => {
+    const start = moment({
+        year: 2022,
+        month: 2,
+        day: 30
+    })
+    const end = moment({
+        year: 2022,
+        month: 5,
+        day: 30
+    })
+    const billDate = 22 //Make sure getReccurenceBill gets billdate as number not string
+    const rec  = getReccurenceBill2(start, end, billDate)
 
+    console.info("RECURRENCE ::", rec)
+} 
+
+// recurrenceTester()
+// recurrenceTester()
 /** Create Server */
 const httpServer = http.createServer(app)
 
@@ -107,4 +144,8 @@ httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is r
 
 
 
+
+function getSum(arg0: string) {
+    throw new Error("Function not implemented.");
+}
 

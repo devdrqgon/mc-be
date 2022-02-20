@@ -78,9 +78,12 @@ const requestBalance = async (_jwt: string) => {
                 'Authorization': bearerJwt
             }
         })
-        console.log("good job bouhmid, your balance is:" + res.data.balances[0].balanceAmount.amount)
+        console.info("good job bouhmid, your closingBookedbalance0 is:" ,res.data.balances[0].balanceAmount.amount )
+        console.info("good job bouhmid, your interimAvailablebalance1 is:" ,res.data.balances[1].balanceAmount.amount )
 
-        return res.data.balances[0].balanceAmount.amount
+        return res.data.balances[1].balanceAmount.amount
+
+
     }
     catch (e) {
         console.error(e)
