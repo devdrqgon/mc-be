@@ -198,22 +198,6 @@ const getOneUserInfo = async (req: Request, res: Response) => {
 
     return res.status(200).json(dto)
 
-
-    // const dbInfo = UserRepo.Info.find({ username })
-    //     .select('-updatedAt')
-    //     .select('-createdAt')
-    //     .select('-_id')
-    //     .exec()
-    //     .then((usrInfo) => {
-
-    //         return res.status(200).json({ usrInfo })
-    //     })
-    //     .catch((err) => {
-    //         logging.error("[userInfoAPI]", err.message, err)
-
-    //         return res.status(409).json({ message: 'no user info found' })
-    //     })
-
 }
 
 //CHeck if user exists in db manually 
