@@ -15,7 +15,7 @@ import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
 import { flowSim, getBalanceLean, getLastUpdateTime, retrieveBalanceDTO, retrieveInfoDTO, updateBalanceDocument, updateBalanceInUserInfoDocument } from "./apis/userInfos/info.api";
-import { getBillsOfUserFromDB, getReccurenceBill2, GetSumBillsInADuration } from "./apis/bills/bill.api";
+import { getBillsOfUserFromDB, getReccurenceBill, GetSumBillsInADuration } from "./apis/bills/bill.api";
 import moment from "moment";
 // import nordigen from "./infrastructure/nordigenAdapter";
 
@@ -106,7 +106,7 @@ const NordigenTester = async () => {
     // console.info("User new info",dto)
     await getBalanceLean()
 }
-NordigenTester()
+// NordigenTester()
 const recurrenceTester = () => {
     const start = moment({
         year: 2022,
@@ -119,7 +119,7 @@ const recurrenceTester = () => {
         day: 30
     })
     const billDate = 22 //Make sure getReccurenceBill gets billdate as number not string
-    const rec  = getReccurenceBill2(start, end, billDate)
+    const rec  = getReccurenceBill(start, end, billDate)
 
     console.info("RECURRENCE ::", rec)
 } 
