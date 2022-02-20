@@ -10,15 +10,6 @@ import { GetSumBillsInADuration } from "../bills/bill.api"
 
 const namespace = "CONTROLLER:[USERINFO]"
 
-const getAllUserInfos = (req: Request, res: Response) => {
-    logging.info(`CONTROLLER:${namespace}`, "attempting to get all UserInfos..", req.body)
-
-}
-
-
-
-
-
 // 2022-02-10 T 16:04:51+01:00
 // 2022-02-10 T15:29:23+01:00
 export const shouldIRefresh = (xHours: number, _nowTime: string, _lastUpdateTime: string) => {
@@ -64,12 +55,12 @@ export const retrieveInfoDTO = async (username: string) => {
     if (doc === null) {
         return null
     } else {
-       const lean= await getLean(username,doc.accounts[0].balance,start,end)
-       const days=countDaysDifference(start, end)
-       const Gasdebt = 290 - 230 //decrease dao from 330 to 100 , so debt is 60
-       const safetyBuffer = 100
-       const transport = 22*3
-       const myTaxes = Gasdebt + safetyBuffer + transport
+        const lean = await getLean(username, doc.accounts[0].balance, start, end)
+        const days = countDaysDifference(start, end)
+        const Gasdebt = 290 - 230 //decrease dao from 330 to 100 , so debt is 60
+        const safetyBuffer = 100
+        const transport = 22 * 3
+        const myTaxes = Gasdebt + safetyBuffer + transport
         const InfoDTO: UserInfoResultDoc = {
             _id: doc._id,
             nextIncome: {
@@ -88,7 +79,7 @@ export const retrieveInfoDTO = async (username: string) => {
 }
 export const getLean = async (username: string, grossBalance: number, start: moment.Moment, end: moment.Moment) => {
     const res = await GetSumBillsInADuration(username, start, end)
-    return grossBalance- res 
+    return grossBalance - res
 }
 export const countDaysDifference = (beginDate: moment.Moment, endDate: moment.Moment
 ) => {
@@ -162,10 +153,10 @@ export const flowSim = async () => { //param _username: string
 
 }
 
-export const getBalanceLean= async ()=>{
+export const getBalanceFromBank = async () => {
     let access_token = await nordigen.requestJWT()
     let newBalance = await nordigen.requestBalance(access_token)
-    
+
     return newBalance
 }
 
@@ -185,7 +176,7 @@ const getOneUserInfo = async (req: Request, res: Response) => {
         await updateBalanceDocument(newBalance, username)
         await updateBalanceInUserInfoDocument(newBalance, username)
     }
-    else{
+    else {
         console.log("NO DB REFRESH REQUIRED; SKIPPING CALLKING THE BANK")
     }
 
@@ -200,7 +191,7 @@ const getOneUserInfo = async (req: Request, res: Response) => {
 
 }
 
-//CHeck if user exists in db manually 
+//CHeck if user exists in db manually, add try catch 
 export const updateBalanceDocument = async (_amount: string, _username: string) => {
 
     const filter = { username: _username }
@@ -272,99 +263,11 @@ const UpdateOneUserInfo = () => { }
 
 export default {
     getOneUserInfo,
-    getAllUserInfos,
     createOneUserInfo,
     UpdateOneUserInfo
 }
 
 
-// if (true) {
-//     UserRepo.Info.find({ username })
-//         .select('-updatedAt')
-//         .select('-createdAt')
-//         .select('-_id')
-//         .exec()
-//         .then((usrInfo) => {
-
-//             return res.status(200).json({ usrInfo })
-//         })
-//         .catch((err) => {
-//             logging.error("[userInfoAPI]", err.message, err)
-
-//             return res.status(409).json({ message: 'no user info found' })
-//         })
-// }
-// else{
-//     // Balance is old, update from NordigenAPI 
-//     //Get new balance from NordigenAPI 
-//     let newBalance =  await nordigen.requestBalance()
-
-//     //Update db
-//     BalanceRepo.Balance.findOneAndUpdate(
-//         { "username": username },
-//         { $set: { "amount": newBalance } },
-//         (error: any, data: any) => {
-//             if (error) {
-//                 console.error(error)
-//             } else {
-//                 return res.status(200).json({data})
-
-//             }
-//         })
-// }   
-
-const periodLength = 5 //days
-const DailyBudget = (nbrOfDays: number, moneyAvailable: number) => {
-    return moneyAvailable / nbrOfDays
-}
-
-
-const BudgetPerPeriod = (nbrOfDays: number, moneyAvailable: number) => {
-    return DailyBudget(nbrOfDays, moneyAvailable) * periodLength
-}
-
-/**
- * 
- * we divide the length of the survival mission in periods, so that we have  milestones 
- * 
- */
-const NbrOfPeriods = (nbrOfDays: number) => {
-    if (nbrOfDays / periodLength)
-        return nbrOfDays / periodLength
-}
-
-const MoneyLowerBound = (nbOfRemainingDays: number, dailyBudget: number) => {
-    return dailyBudget * nbOfRemainingDays
-
-}
-const isTheMoneyEnough = (dailyBudget: number, moneyAvailable: number, nbOfRemainingDays: number) => {
-    // Maybe we add ma7zou9DailyBudget, ma7loul daily Budget.. 
-
-    //Current money (moneyAvailable) should always be greater than MoneyLowerBound
-    let _moneyLowerBound = MoneyLowerBound(nbOfRemainingDays, dailyBudget)
-    if (_moneyLowerBound > moneyAvailable) {
-        return false
-    }
-    return true
-
-}
-
-const canISaveXEur = (XEur: number, nbOfRemainingDays: number, dailyBudget: number, moneyAvailable: number) => {
-    let _moneyLowerBound = MoneyLowerBound(nbOfRemainingDays, dailyBudget)
-
-    if (_moneyLowerBound < (moneyAvailable + XEur)) {
-        return true
-    }
-    return false
-}
-//MC must remind user to not exceed period budget
-
-/**
- * 
- * as a user i want to create a goal 
- * 
- * i want to survive with 2700 till 31 March 
- *  MC: your DailyBudget()
- * 
- * 
- */
+ 
+ 
+  
