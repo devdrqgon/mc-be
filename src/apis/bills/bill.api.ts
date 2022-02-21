@@ -3,6 +3,7 @@ import moment from "moment";
 import { Bill } from "../../domain/user.domain";
 import logging from "../../infrastructure/logging";
 import { UserRepo } from "../../persistence/user/user.schemas";
+import mongoose from 'mongoose';
 
 
 
@@ -27,12 +28,102 @@ export const updateBill = (req: Request, res: Response) => {
         })
 
 }
+interface BillsInfo {
+    paid: Bill[]
+    notYet: Bill[]
+}
 
 
-export const GetSumBillsInADuration = async (username: string, start: moment.Moment, end: moment.Moment) => {
+export const GetBillsInfo = async (req: Request, res: Response) => {
+    const dto: BillsInfo = {
+        paid: [
+            // await getPaidBills()
+        ],
+        notYet: [
 
-    //get user bills 
+        ]
+    }
+    return res.status(200).json(dto)
+}
+
+interface Mapper {
+    billMCname:string,
+    billBankName: string
+    when:{
+        on:number|null,
+        range:Range | null
+    }
+}
+interface Range {
+    begin:number,
+    end:number
+}
+interface Transaltion{
+    billMCname:string,
+    billBank: {
+        creditorName:string,
+        amount:number,
+        valueDate: string
+    }
+}
+const createNewBillsCollection =  async (username:string)=> {
+    const _transaltion :Transaltion[]= [
+        {
+            billMCname:"audible",
+            billBank: {
+                creditorName:"AUDIBLE GMBH",
+                amount:-9.95,
+                valueDate: "2022-01-18"
+            }
+        }
+    ]
     const bills = await getBillsOfUserFromDB(username)
+    let mappedBills : Mapper[]=[]
+    bills.forEach(element => {
+        mappedBills.push({
+            billBankName: 
+        })
+    
+        var BookSchema = new mongoose.Schema({
+            name: String,
+            price: Number,
+            quantity: Number
+        });
+       
+          // compile schema to model
+          var Book = mongoose.model('Book', BookSchema, 'bookstore');
+       
+          // a document instance
+          var book1 = new Book({ name: 'Introduction to Mongoose', price: 10, quantity: 25 });
+       
+          // save model to database
+          book1.save(function (err, book) {
+            if (err) return console.error(err);
+            console.log(book.name + " saved to bookstore collection.");
+          });
+      
+    });
+}
+const GetUnpaidBillsINaDuration = async (username: string, start: moment.Moment, end: moment.Moment) => {
+    /**
+    * The idea is to get the transactions from bank, and look for predefined transactions,
+    *  which their names and amount matches the user's bills 
+    */
+
+    //1.Get user Bills 
+    const bills = await getBillsOfUserFromDB(username)
+
+    //2.Get all bills in the duration 
+    const billsWithRecurrence = await getBillsRecurrenceInADuration(bills, start, end)
+
+    //3filter the Unpaid Bills 
+    //3.a refresh duration transactions from bank, if necessary
+          
+    //3.b check if bill B is included in the transactions 
+
+    //return the unpaid bills with recurrence 
+}
+export const getBillsRecurrenceInADuration = (bills: Bill[], start: moment.Moment, end: moment.Moment) => {
     let analyzedBillS: AnalyzedBill[] = []
     bills.forEach(b => {
 
@@ -44,7 +135,17 @@ export const GetSumBillsInADuration = async (username: string, start: moment.Mom
             when: b.when
         }
         analyzedBillS.push(dto)
-    });
+    })
+    return analyzedBillS
+}
+
+
+
+export const GetSumBillsInADuration = async (username: string, start: moment.Moment, end: moment.Moment) => {
+
+    //get user bills 
+    const bills = await getBillsOfUserFromDB(username)
+    const analyzedBillS = getBillsRecurrenceInADuration(bills, start, end)
     //prepare billsAnalysis, to calculate sum
     //calculate sum
     console.info("_analyzedBills::", analyzedBillS)

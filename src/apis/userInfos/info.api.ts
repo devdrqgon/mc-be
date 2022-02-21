@@ -6,7 +6,7 @@ import IBalanceDoc from "../../persistence/balance/balance.docs"
 import { BalanceRepo } from "../../persistence/balance/balance.schemas"
 import { UserRepo } from "../../persistence/user/user.schemas"
 import moment from 'moment'
-import { GetSumBillsInADuration } from "../bills/bill.api"
+import { getBillsOfUserFromDB, getBillsRecurrenceInADuration as analyzeBills, GetSumBillsInADuration } from "../bills/bill.api"
 
 const namespace = "CONTROLLER:[USERINFO]"
 
@@ -37,7 +37,23 @@ export const getLastUpdateTime = async (username: string) => {
     console.error("getLastUpdateTime returned null")
     return null
 }
-export const retrieveInfoDTO = async (username: string) => {
+
+async function survive(username:string,start:moment.Moment,end:moment.Moment) {
+    const balance = nordigen.requestBalance( await  nordigen.requestJWT()) 
+    const gg = GetSumBillsInADuration(username,start,end)
+    const bills = await getBillsOfUserFromDB(username)
+    // const billsAlreadyPaid = await getBillsAlreadyPaid()
+  
+    const analyzedBillS = analyzeBills(bills, start, end)
+   
+    const res:UserInfoResultDoc= {
+         
+    }
+}
+
+
+
+export const CreateInfoObj = async (username: string) => {
     const start = moment({
         year: moment().year(),
         month: moment().month(),
@@ -55,12 +71,23 @@ export const retrieveInfoDTO = async (username: string) => {
     if (doc === null) {
         return null
     } else {
-        const lean = await getLean(username, doc.accounts[0].balance, start, end)
+        const obj: {
+            _id:string,
+
+        } = {
+            _id:Z
+        }
+        const balance = doc.accounts[0].balance  
+        const lean = await survive(username, start, end)
+
+
         const days = countDaysDifference(start, end)
         const Gasdebt = 290 - 230 //decrease dao from 330 to 100 , so debt is 60
         const safetyBuffer = 100
         const transport = 22 * 3
         const myTaxes = Gasdebt + safetyBuffer + transport
+
+
         const InfoDTO: UserInfoResultDoc = {
             _id: doc._id,
             nextIncome: {
@@ -77,17 +104,15 @@ export const retrieveInfoDTO = async (username: string) => {
     }
 
 }
-export const getLean = async (username: string, grossBalance: number, start: moment.Moment, end: moment.Moment) => {
-    const res = await GetSumBillsInADuration(username, start, end)
-    return grossBalance - res
-}
+ 
+
 export const countDaysDifference = (beginDate: moment.Moment, endDate: moment.Moment
 ) => {
     const duration = moment.duration(endDate.add(1, 'day').diff(beginDate))
     // console.info("Diff", duration.asDays())
     return Math.round(duration.asDays())
 }
-interface UserInfoResultDoc {
+export interface UserInfoResultDoc {
     _id: string,
     nextIncome: {
         amount: number,
@@ -181,7 +206,7 @@ const getOneUserInfo = async (req: Request, res: Response) => {
     }
 
 
-    const dto = await retrieveInfoDTO(username)
+    const dto = await CreateInfoObj(username)
 
     console.info("User new info", dto)
 
@@ -268,6 +293,5 @@ export default {
 }
 
 
- 
- 
-  
+
+

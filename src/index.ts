@@ -14,7 +14,7 @@ import billRoutes from "./apis/bills/bill.routes";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
-import { flowSim, getBalanceFromBank, getLastUpdateTime, retrieveBalanceDTO, retrieveInfoDTO, updateBalanceDocument, updateBalanceInUserInfoDocument } from "./apis/userInfos/info.api";
+import { flowSim, getBalanceFromBank, getLastUpdateTime, retrieveBalanceDTO, CreateInfoObj, updateBalanceDocument, updateBalanceInUserInfoDocument } from "./apis/userInfos/info.api";
 import { getBillsOfUserFromDB, getReccurenceBill, GetSumBillsInADuration } from "./apis/bills/bill.api";
 import moment from "moment";
 // import nordigen from "./infrastructure/nordigenAdapter";
