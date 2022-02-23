@@ -74,7 +74,7 @@ export const retrieveInfoDTO = async (username: string) => {
             },
             maxPerDay: parseFloat(((lean - myTaxes) / days).toFixed(2)),
             maxPerWeek: parseFloat((((lean - myTaxes) / days) * 7).toFixed(2)),
-
+            willBeSaved: safetyBuffer
         }
         return InfoDTO
     }
@@ -102,7 +102,8 @@ interface UserInfoResultDoc {
         netto: number
     },
     maxPerDay: number,
-    maxPerWeek: number
+    maxPerWeek: number,
+    willBeSaved: number,
 }
 export const retrieveBalanceDTO = async (username: string) => {
 
