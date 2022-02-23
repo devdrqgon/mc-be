@@ -57,10 +57,10 @@ export const retrieveInfoDTO = async (username: string) => {
     } else {
         const lean = await getLean(username, doc.accounts[0].balance, start, end)
         const days = countDaysDifference(start, end)
-        const Gasdebt = 290 - 230 //decrease dao from 330 to 100 , so debt is 60
+        const Gasdebt = 234.15 //decrease dao from 330 to 100 , so debt is 60
         const safetyBuffer = 100
-        const transport = 22 * 3
-        const myTaxes = Gasdebt + safetyBuffer + transport
+        const transport = 22 * 2
+        const myTaxes =  Gasdebt+ safetyBuffer + transport
         const InfoDTO: UserInfoResultDoc = {
             _id: doc._id,
             nextIncome: {
@@ -68,10 +68,12 @@ export const retrieveInfoDTO = async (username: string) => {
                 daysleft: days
             },
             balance: {
-                gross: doc.accounts[0].balance,
+                gross: doc.accounts[0].balance ,
                 netto: lean - myTaxes
             },
-            maxPerDay: (lean - myTaxes) / days
+            maxPerDay: (lean - myTaxes) / days ,
+            maxPerWeek: ((lean - myTaxes) / days )*7
+
         }
         return InfoDTO
     }
@@ -97,7 +99,8 @@ interface UserInfoResultDoc {
         gross: number,
         netto: number
     },
-    maxPerDay: number
+    maxPerDay: number,
+    maxPerWeek: number
 }
 export const retrieveBalanceDTO = async (username: string) => {
 

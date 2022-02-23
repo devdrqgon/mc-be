@@ -87,26 +87,26 @@ const NordigenTester = async () => {
     // const res = await updateBalanceInUserInfoDocument("1", 'amddev')
     // console.log("UPDATED USERINFO DOC ::", res)
     // await flowSim()
-    // await flowSim()
-    // const start = moment({
-    //     year: moment().year(),
-    //     month: moment().month(),
-    //     day: moment().date(),
-    // })
+     await flowSim()
+    const start = moment({
+        year: moment().year(),
+        month: moment().month(),
+        day: moment().date(),
+    })
  
-    // const end = moment({
-    //     year: 2022,
-    //     month: 2,
-    //     day: 30 
-    // })
-    // // GetSumBillsInADuration('amddev',start,end)
-    // // retrieveInfoDTO('amddev')
-    // const dto = await retrieveInfoDTO('amddev')
+    const end = moment({
+        year: 2022,
+        month: 2,
+        day: 30 
+    })
+     //GetSumBillsInADuration('amddev',start,end)
+    // retrieveInfoDTO('amddev')
+    const dto = await retrieveInfoDTO('amddev')
 
-    // console.info("User new info",dto)
-    await getBalanceFromBank()
+    console.info("User new info",dto)
+   // await getBalanceFromBank()
 }
-// NordigenTester()
+ NordigenTester()
 const recurrenceTester = () => {
     const start = moment({
         year: 2022,
