@@ -60,19 +60,20 @@ export const retrieveInfoDTO = async (username: string) => {
         const Gasdebt = 234.15 //decrease dao from 330 to 100 , so debt is 60
         const safetyBuffer = 100
         const transport = 22 * 2
-        const myTaxes =  Gasdebt+ safetyBuffer + transport
+        const myTaxes = Gasdebt + safetyBuffer + transport
         const InfoDTO: UserInfoResultDoc = {
             _id: doc._id,
             nextIncome: {
                 amount: doc.salary.amount,
-                daysleft: days
+                daysleft: days,
+                weeksLeft: parseFloat((days / 7).toFixed(2))
             },
             balance: {
-                gross: doc.accounts[0].balance ,
-                netto: lean - myTaxes
+                gross: doc.accounts[0].balance,
+                netto: parseFloat((lean - myTaxes).toFixed(3))
             },
-            maxPerDay: (lean - myTaxes) / days ,
-            maxPerWeek: ((lean - myTaxes) / days )*7
+            maxPerDay: parseFloat(((lean - myTaxes) / days).toFixed(2)),
+            maxPerWeek: parseFloat((((lean - myTaxes) / days) * 7).toFixed(2)),
 
         }
         return InfoDTO
@@ -93,7 +94,8 @@ interface UserInfoResultDoc {
     _id: string,
     nextIncome: {
         amount: number,
-        daysleft: number
+        daysleft: number,
+        weeksLeft: number
     },
     balance: {
         gross: number,
@@ -271,6 +273,5 @@ export default {
 }
 
 
- 
- 
-  
+
+
