@@ -93,7 +93,8 @@ export interface Bill {
     billName: string,
     username: string,
     paid: boolean,
-    when: number
+    when: number,
+    NameInBankAccount: string
 
 }
 export class SalaryInfo {

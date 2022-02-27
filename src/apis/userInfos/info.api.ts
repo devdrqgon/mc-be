@@ -6,7 +6,7 @@ import IBalanceDoc from "../../persistence/balance/balance.docs"
 import { BalanceRepo } from "../../persistence/balance/balance.schemas"
 import { UserRepo } from "../../persistence/user/user.schemas"
 import moment from 'moment'
-import { GetSumBillsInADuration } from "../bills/bill.api"
+import { calculateSum, generateBillsAnalysis } from "../bills/bill.api"
 
 const namespace = "CONTROLLER:[USERINFO]"
 
@@ -55,12 +55,16 @@ export const retrieveInfoDTO = async (username: string) => {
     if (doc === null) {
         return null
     } else {
-        const lean = await getLean(username, doc.accounts[0].balance, start, end)
+        let access_token = await nordigen.requestJWT()
+
+        const grossbalance = 1744
+        const lean = await getLean(access_token,username, grossbalance, start, end)
         const days = countDaysDifference(start, end)
-        const Gasdebt = 234.15 //decrease dao from 330 to 100 , so debt is 60
+        const Gasdebt = 0 //decrease dao from 330 to 100 , so debt is 60
         const safetyBuffer = 100
         const transport = 22 * 2
         const myTaxes = Gasdebt + safetyBuffer + transport
+        const netto = parseFloat((lean - myTaxes).toFixed(3)) + 0
         const InfoDTO: UserInfoResultDoc = {
             _id: doc._id,
             nextIncome: {
@@ -69,20 +73,23 @@ export const retrieveInfoDTO = async (username: string) => {
                 weeksLeft: parseFloat((days / 7).toFixed(2))
             },
             balance: {
-                gross: doc.accounts[0].balance,
-                netto: parseFloat((lean - myTaxes).toFixed(3))
+                gross: grossbalance,
+                netto
             },
-            maxPerDay: parseFloat(((lean - myTaxes) / days).toFixed(2)),
-            maxPerWeek: parseFloat((((lean - myTaxes) / days) * 7).toFixed(2)),
+            maxPerDay: parseFloat((netto / days).toFixed(2)),
+            maxPerWeek: parseFloat(((netto / days) * 7).toFixed(2)),
             willBeSaved: safetyBuffer
         }
         return InfoDTO
     }
 
 }
-export const getLean = async (username: string, grossBalance: number, start: moment.Moment, end: moment.Moment) => {
-    const res = await GetSumBillsInADuration(username, start, end)
-    return grossBalance - res
+export const getLean = async (jwt:string,username: string, grossBalance: number, start: moment.Moment, end: moment.Moment) => {
+    const analyzedBillS = await generateBillsAnalysis(jwt,username, start, end)
+    const sum = calculateSum(analyzedBillS)
+
+    console.info("Sum of Bills::", sum)
+    return grossBalance - sum
 }
 export const countDaysDifference = (beginDate: moment.Moment, endDate: moment.Moment
 ) => {
@@ -150,8 +157,8 @@ export const flowSim = async () => { //param _username: string
         let newBalance = await nordigen.requestBalance(access_token)
         console.log('New Balance received! ::' + newBalance)
         //Update collection 
-        await updateBalanceDocument(newBalance, username)
-        await updateBalanceInUserInfoDocument(newBalance, username)
+        await updateBalanceDocument(newBalance!, username)
+        await updateBalanceInUserInfoDocument(newBalance!, username)
     }
     else {
         console.log("NOT GONNA REFRESH")
@@ -159,13 +166,24 @@ export const flowSim = async () => { //param _username: string
 
 }
 
-export const getBalanceFromBank = async () => {
+export const getBalanceFromBankTester = async () => {
     let access_token = await nordigen.requestJWT()
-    let newBalance = await nordigen.requestBalance(access_token)
+    let newBalance = await nordigen.requestBalance(access_token!)
 
     return newBalance
 }
+export const getTransactionsFromBankTester = async () => {
+    const start = moment({
+        year: moment().year(),
+        month: moment().month(),
+        day: moment().date(),
+    })
+    
+    let access_token = await nordigen.requestJWT()
+    const BankTransactions = await nordigen.getTransactions(access_token! , start)
 
+    return BankTransactions
+}
 //Create a middleware that verifies if the user Account exists in db
 const getOneUserInfo = async (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
@@ -179,8 +197,8 @@ const getOneUserInfo = async (req: Request, res: Response) => {
         let newBalance = await nordigen.requestBalance(access_token)
         console.log('New Balance received! ::' + newBalance)
         //Update collection 
-        await updateBalanceDocument(newBalance, username)
-        await updateBalanceInUserInfoDocument(newBalance, username)
+        await updateBalanceDocument(newBalance!, username)
+        await updateBalanceInUserInfoDocument(newBalance!, username)
     }
     else {
         console.log("NO DB REFRESH REQUIRED; SKIPPING CALLKING THE BANK")
@@ -198,10 +216,10 @@ const getOneUserInfo = async (req: Request, res: Response) => {
 }
 
 //CHeck if user exists in db manually, add try catch 
-export const updateBalanceDocument = async (_amount: string, _username: string) => {
+export const updateBalanceDocument = async (_amount: number, _username: string) => {
 
     const filter = { username: _username }
-    const update = { amount: _amount }
+    const update = { amount: _amount.toString() }
     let doc = await BalanceRepo.Balance.findOneAndUpdate(filter, update, {
         new: true
     })
@@ -209,9 +227,13 @@ export const updateBalanceDocument = async (_amount: string, _username: string) 
 }
 
 //619ccb47714cfd0cb3bb4136 accId
-export const updateBalanceInUserInfoDocument = async (_amount: string, _username: string) => {
+export const updateBalanceInUserInfoDocument = async (_amount: number, _username: string) => {
+
+    //are there any to be booked transactions ?
+    //const interim = await nordigen.interim()
+    const update = { $set: { "accounts.$.balance": _amount.toString() } }
     const filter = { "username": _username, "accounts.accountType": 'main' }
-    const update = { $set: { "accounts.$.balance": _amount } }
+
     let doc = await UserRepo.Info.findOneAndUpdate(filter, update, {
         new: true
     })

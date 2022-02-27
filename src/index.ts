@@ -14,9 +14,10 @@ import billRoutes from "./apis/bills/bill.routes";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
-import { flowSim, getBalanceFromBank, getLastUpdateTime, retrieveBalanceDTO, retrieveInfoDTO, updateBalanceDocument, updateBalanceInUserInfoDocument } from "./apis/userInfos/info.api";
-import { getBillsOfUserFromDB, getReccurenceBill, GetSumBillsInADuration } from "./apis/bills/bill.api";
+import { flowSim, getTransactionsFromBankTester, getLastUpdateTime, retrieveBalanceDTO, retrieveInfoDTO, updateBalanceDocument, updateBalanceInUserInfoDocument, getBalanceFromBankTester } from "./apis/userInfos/info.api";
+import { getBillsOfUserFromDB, getReccurenceBill, generateBillsAnalysis } from "./apis/bills/bill.api";
 import moment from "moment";
+import nordigen, { getTransactions } from "./infrastructure/nordigenAdapter";
 // import nordigen from "./infrastructure/nordigenAdapter";
 
 
@@ -87,13 +88,18 @@ const NordigenTester = async () => {
     // const res = await updateBalanceInUserInfoDocument("1", 'amddev')
     // console.log("UPDATED USERINFO DOC ::", res)
     // await flowSim()
-     await flowSim()
+     //await flowSim()
     const start = moment({
         year: moment().year(),
         month: moment().month(),
         day: moment().date(),
     })
- 
+
+    const start2 = moment({
+        year: 2021,
+        month:11,
+        day: 1 
+    })
     const end = moment({
         year: 2022,
         month: 2,
@@ -101,10 +107,15 @@ const NordigenTester = async () => {
     })
      //GetSumBillsInADuration('amddev',start,end)
     // retrieveInfoDTO('amddev')
-    const dto = await retrieveInfoDTO('amddev')
-
-    console.info("User new info",dto)
+    // //const dto = await retrieveInfoDTO('amddev')
+    // const dto = await getBalanceFromBankTester()
+    // console.info("getBalanceFromBankTester o",dto)
    // await getBalanceFromBank()
+
+   let access_token = await nordigen.requestJWT()
+    const t = await getTransactions(access_token,start2)
+     console.info("getTransactions o",t)
+
 }
  NordigenTester()
 const recurrenceTester = () => {
@@ -149,3 +160,41 @@ function getSum(arg0: string) {
     throw new Error("Function not implemented.");
 }
 
+/**
+ * 
+ * 
+ * {
+      additionalInformation: 'FOLGELASTSCHRIFT',
+      bookingDate: '2022-02-01',
+      creditorAccount: [Object],
+      creditorAgent: 'DEUTDEFF',
+      creditorName: 'PayPal (Europe) S.a.r.l. et Cie., S.C.A.',
+      debtorAgent: 'HEISDE66',
+      endToEndId: '1018196478281 PP.7317.PP PAYPAL',
+      entryReference: '2022-02-01-04.25.46.774454',
+      mandateId: '4AG2224SC2RGY',
+      proprietaryBankTransactionCode: 'NDDT+105+9250+992-DK',
+      remittanceInformationStructured: 'PP.7317.PP . Getsafe Digital GmbH, Ihr Einkauf bei Getsafe Digital GmbH',
+      transactionAmount: [Object],
+      transactionId: '516b94d9d83c2b4e6a06f31ce87afca0',
+      valueDate: '2022-02-01'
+    },
+
+
+    {
+      additionalInformation: 'FOLGELASTSCHRIFT',
+      bookingDate: '2022-02-01',
+      creditorAccount: [Object],
+      creditorAgent: 'DEUTDEFF',
+      creditorName: 'PayPal (Europe) S.a.r.l. et Cie., S.C.A.',
+      debtorAgent: 'HEISDE66',
+      endToEndId: '1018196479072 PP.7317.PP PAYPAL',
+      entryReference: '2022-02-01-04.22.34.265170',
+      mandateId: '4AG2224SC2RGY',
+      proprietaryBankTransactionCode: 'NDDT+105+9250+992-DK',
+      remittanceInformationStructured: 'PP.7317.PP . Getsafe Digital GmbH, Ihr Einkauf bei Getsafe Digital GmbH',
+      transactionAmount: [Object],
+      transactionId: '67fa5f65b183d94e8cec3ef562e457e7',
+      valueDate: '2022-02-01'
+    },
+ */
