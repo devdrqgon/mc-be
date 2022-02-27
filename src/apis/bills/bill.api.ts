@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import moment from "moment";
+import { stringify } from "querystring";
 import { Bill } from "../../domain/user.domain";
 import logging from "../../infrastructure/logging";
+import nordigen, { TransactionConverted } from "../../infrastructure/nordigenAdapter";
 import { UserRepo } from "../../persistence/user/user.schemas";
-
+import { getLastUpdateTime, shouldIRefresh } from "../userInfos/info.api";
+import InMemoryBills from './data'
 
 
 export const updateBill = (req: Request, res: Response) => {
@@ -27,21 +30,55 @@ export const updateBill = (req: Request, res: Response) => {
         })
 
 }
-
-
-export const GetSumBillsInADuration = async (username: string, start: moment.Moment, end: moment.Moment) => {
-
+/**
+ *  gets recognized by remittanceInformationStructured
+ * 
+ * GetSafe???? 
+  * 
+ * remittanceInformationStructured && Price 
+ *  #Paypal zahlungen
+ *  #Barmenia
+ * 
+ *  
+ * 
+*/
+ 
+export const getTimesAlreadyPaid = (b: Bill, transactions: TransactionConverted[]) => {
+    let times = 0
+    transactions.forEach(t => {
+        if (t.remittanceInformationStructured.replace(/\s+/g, '') == b.NameInBankAccount.replace(/\s+/g, '')) {
+            times = times + 1
+        }
+    })
+    return times
+}
+ 
+export const generateBillsAnalysis = async (jwt: string, username: string, start: moment.Moment, end: moment.Moment) => {
+    //Get User Transaction 
+    const transactions = await nordigen.getTransactions(jwt, start)
     //get user bills 
-    const bills = await getBillsOfUserFromDB(username)
+    // const bills = await getBillsOfUserFromDB(username)
+     
     let analyzedBillS: AnalyzedBill[] = []
-    bills.forEach(b => {
 
+
+
+    InMemoryBills.CreditorNameNoPrice.forEach(b => {
+        //Get recurrence 
+        
+        //get already paid 
+    })
+    //get userTransactions
+    //const transactions: any[] = getUserTransactions(username)
+    bills.forEach(b => {
+        const recurrs = getReccurenceBill(start, end, b.when)
+        const timesAlreadyPaid = getTimesAlreadyPaid(b, transactions)
         const dto: AnalyzedBill = {
             idRef: b._id,
             amount: b.cost,
             name: b.billName,
-            recurrs: getReccurenceBill(start, end, b.when),
-            when: b.when
+            when: b.when,
+            paymentsLeft: recurrs - timesAlreadyPaid
         }
         analyzedBillS.push(dto)
     });
@@ -49,17 +86,14 @@ export const GetSumBillsInADuration = async (username: string, start: moment.Mom
     //calculate sum
     console.info("_analyzedBills::", analyzedBillS)
 
-    const sum = calculateSum(analyzedBillS)
-
-    console.info("Sum of Bills::", sum)
-    return sum
+    return analyzedBillS
 }
 interface AnalyzedBill {
     idRef: string,
     name: string,
     amount: number,
-    recurrs: number,
-    when: number
+    when: number,
+    paymentsLeft: number
 }
 
 
@@ -119,12 +153,12 @@ export function getReccurenceBill(beginDate: moment.Moment, endDate: moment.Mome
 
 }
 
-function calculateSum(billsAnalyzed: AnalyzedBill[]) {
+export function calculateSum(billsAnalyzed: AnalyzedBill[]) {
 
     let sum = 0
 
     billsAnalyzed.forEach(b => {
-        sum = sum + (b.amount * b.recurrs)
+        sum = sum + (b.amount * b.paymentsLeft)
     })
     return sum
 
@@ -147,4 +181,5 @@ export const getBillsOfUserFromDB = async (username: string) => {
 
 
 }
+
 
