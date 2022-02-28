@@ -3,7 +3,7 @@ import axios from 'axios'
 import e from 'express'
 import moment from 'moment'
 import { v4 as uuidv4 } from 'uuid'
-import { generateBillsAnalysis } from '../apis/bills/bill.api'
+import {  Jso } from '../apis/bills/bill.api'
 import { updateBalanceDocument } from '../apis/userInfos/info.api'
 import { Bill } from '../domain/user.domain'
 
@@ -85,16 +85,7 @@ const requestBalance = async (_jwt: string) => {
 
 }
 
-
-export const UpdateDBFromBank = async (username: string, bills: Bill[], start: moment.Moment, end: moment.Moment) => {
-    let access_token = await nordigen.requestJWT()
-
-    //Get The Balance 
-    const balance = await requestBalance(access_token)
-    await updateBalanceDocument(balance, username)
-    //Analyse ur bills 
-    const analyzedBillS = await generateBillsAnalysis(access_token, username, start, end)
-}
+ 
 export const getInterimFromBank = async (jwt: string) => {
     const myT: any[] = []
     let transactionsBank = await axios({
@@ -121,7 +112,7 @@ export const getInterimFromBank = async (jwt: string) => {
     })
     return interim
 }
-export const getTransactions = async (_jwt: string,   start: moment.Moment) => {
+export const getTransactions = async (_jwt: string, start: moment.Moment) => {
     // // console.log(`Bearer ${_jwt}`)
     const startParamQuery = encodeURIComponent(start.format('YYYY-MM-DD'))
 
@@ -136,13 +127,15 @@ export const getTransactions = async (_jwt: string,   start: moment.Moment) => {
         }
     })
     console.info("TRANSACTI", res.data.transactions)
-    const myT: TransactionConverted[] = []
+    const myT: Jso[] = []
 
     res.data.transactions.booked.forEach((t: any) => {
 
         myT.push({
             remittanceInformationStructured: t.remittanceInformationStructured,
             amount: parseFloat(t.transactionAmount.amount)
+            ,
+            creditorName: t.creditorName
 
         })
     })
@@ -150,15 +143,17 @@ export const getTransactions = async (_jwt: string,   start: moment.Moment) => {
 
         myT.push({
             remittanceInformationStructured: t.remittanceInformationStructured,
-            amount: parseFloat(t.transactionAmount.amount)
+            amount: parseFloat(t.transactionAmount.amount),
+            creditorName: t.creditorName
 
         })
     })
     return myT
 }
 export interface TransactionConverted {
-    remittanceInformationStructured: string,
-    amount: number
+    remittanceInformationStructured: string|undefined;
+    amount: number;
+    creditorName: string|undefined;
 
 }
 const nordigen = {

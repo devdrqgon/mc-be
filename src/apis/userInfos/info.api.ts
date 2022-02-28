@@ -6,7 +6,8 @@ import IBalanceDoc from "../../persistence/balance/balance.docs"
 import { BalanceRepo } from "../../persistence/balance/balance.schemas"
 import { UserRepo } from "../../persistence/user/user.schemas"
 import moment from 'moment'
-import { calculateSum, generateBillsAnalysis } from "../bills/bill.api"
+import { calculateSum  } from "../bills/bill.api"
+import { sumOfEverything } from "../bills/data"
 
 const namespace = "CONTROLLER:[USERINFO]"
 
@@ -57,7 +58,7 @@ export const retrieveInfoDTO = async (username: string) => {
     } else {
         let access_token = await nordigen.requestJWT()
 
-        const grossbalance = 1744
+        const grossbalance = await nordigen.requestBalance(access_token)
         const lean = await getLean(access_token,username, grossbalance, start, end)
         const days = countDaysDifference(start, end)
         const Gasdebt = 0 //decrease dao from 330 to 100 , so debt is 60
@@ -85,11 +86,11 @@ export const retrieveInfoDTO = async (username: string) => {
 
 }
 export const getLean = async (jwt:string,username: string, grossBalance: number, start: moment.Moment, end: moment.Moment) => {
-    const analyzedBillS = await generateBillsAnalysis(jwt,username, start, end)
-    const sum = calculateSum(analyzedBillS)
+    // const analyzedBillS = await generateBillsAnalysis(jwt,username, start, end)
+    // const sum = calculateSum(analyzedBillS)
 
-    console.info("Sum of Bills::", sum)
-    return grossBalance - sum
+    // console.info("Sum of Bills::", sum)
+    return grossBalance - sumOfEverything()
 }
 export const countDaysDifference = (beginDate: moment.Moment, endDate: moment.Moment
 ) => {

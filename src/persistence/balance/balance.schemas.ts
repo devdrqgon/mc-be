@@ -25,14 +25,8 @@ const balanceSchema = new Schema(
 
 
 
-
-/** Did not name Userrepo, although it is a repo
- * because the important object would give access 
- * to all repos. and it is named with the suffix 'Repo' e.g 'UserRepo.Acounts'
- */
-
-// TODO: rename to plural
-const Balance = mongoose.model<IBalanceDoc>('balances', balanceSchema) //Rename faile to UserSChema ??????
+ 
+ const Balance = mongoose.model<IBalanceDoc>('balances', balanceSchema) //Rename faile to UserSChema ??????
 
 
 export const BalanceRepo = {

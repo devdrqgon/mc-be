@@ -6,7 +6,8 @@
  * No Support for Refresh Tokens, TODO: Research and maybe Implementation 
  */
 
-
+import fs from 'fs'
+import jsonDatafrom from '../transactions.json'
 import express from "express";
 import userAuthRoutes from "./apis/auth/auth.route"
 import userInfoRoutes from "./apis/userInfos/info.route";
@@ -15,9 +16,11 @@ import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
 import { flowSim, getTransactionsFromBankTester, getLastUpdateTime, retrieveBalanceDTO, retrieveInfoDTO, updateBalanceDocument, updateBalanceInUserInfoDocument, getBalanceFromBankTester } from "./apis/userInfos/info.api";
-import { getBillsOfUserFromDB, getReccurenceBill, generateBillsAnalysis } from "./apis/bills/bill.api";
+import { getBillsOfUserFromDB, getReccurenceBill,  Jso } from "./apis/bills/bill.api";
 import moment from "moment";
-import nordigen, { getTransactions } from "./infrastructure/nordigenAdapter";
+import nordigen, { getTransactions, TransactionConverted } from "./infrastructure/nordigenAdapter";
+import { Mongoose } from "mongoose";
+import {   sumOfEverything } from './apis/bills/data';
 // import nordigen from "./infrastructure/nordigenAdapter";
 
 
@@ -88,36 +91,52 @@ const NordigenTester = async () => {
     // const res = await updateBalanceInUserInfoDocument("1", 'amddev')
     // console.log("UPDATED USERINFO DOC ::", res)
     // await flowSim()
-     //await flowSim()
-    const start = moment({
+    //await flowSim()
+    const now = moment({
         year: moment().year(),
         month: moment().month(),
         day: moment().date(),
     })
 
     const start2 = moment({
-        year: 2021,
-        month:11,
-        day: 1 
+        year: 2022,
+        month: 1,
+        day: 1
     })
     const end = moment({
         year: 2022,
         month: 2,
-        day: 30 
+        day: 30
     })
-     //GetSumBillsInADuration('amddev',start,end)
+    //GetSumBillsInADuration('amddev',start,end)
     // retrieveInfoDTO('amddev')
     // //const dto = await retrieveInfoDTO('amddev')
     // const dto = await getBalanceFromBankTester()
     // console.info("getBalanceFromBankTester o",dto)
-   // await getBalanceFromBank()
+    // await getBalanceFromBank()
 
-   let access_token = await nordigen.requestJWT()
-    const t = await getTransactions(access_token,start2)
-     console.info("getTransactions o",t)
+    //    let access_token = await nordigen.requestJWT()
+    //     const t = await getTransactions(access_token, start2)
+    //     let jsonContent = JSON.stringify(t);
 
+    //     fs.writeFile("transactions.json", jsonContent, 'utf8', function (err) {
+    //         if (err) {
+    //             console.log("An error occured while writing JSON Object to File.");
+    //             return console.log(err);
+    //         }
+
+    //         console.log("JSON file has been saved.");
+    //     });
+
+    // let t :Jso[] = []
+    // jsonDatafrom.forEach(element => {
+    //     t.push(element)
+    // })
+    // console.info(" sumOfEverything() o",  sumOfEverything())
+
+    //  analyzecreditorNameNoPrice(start2,end,t)
 }
- NordigenTester()
+NordigenTester()
 const recurrenceTester = () => {
     const start = moment({
         year: 2022,
@@ -130,10 +149,10 @@ const recurrenceTester = () => {
         day: 30
     })
     const billDate = 22 //Make sure getReccurenceBill gets billdate as number not string
-    const rec  = getReccurenceBill(start, end, billDate)
+    // const rec  = getReccurenceBill(start, end, billDate)
 
-    console.info("RECURRENCE ::", rec)
-} 
+    // console.info("RECURRENCE ::", rec)
+}
 
 // recurrenceTester()
 // recurrenceTester()
