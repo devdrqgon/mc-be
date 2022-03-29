@@ -1,4 +1,12 @@
-export interface IBill {
+
+/** try to stay DDD 
+ * this is Domain layer 
+ */
+
+import { Document } from 'mongoose'
+
+export  interface BillDoc extends Document {
+
     friendlyName: string,
     text: string,
     when: {
@@ -9,3 +17,5 @@ export interface IBill {
     paid: string,
     billType: string
 }
+
+ 

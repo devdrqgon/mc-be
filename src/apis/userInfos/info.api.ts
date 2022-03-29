@@ -1,12 +1,14 @@
 import { NextFunction, Request, Response } from "express"
 import mongoose from 'mongoose'
 import logging from "../../infrastructure/logging"
-import nordigen from "../../infrastructure/nordigenAdapter"
+import nordigen, { getTransactions } from "../../infrastructure/nordigenAdapter"
 import IBalanceDoc from "../../persistence/balance/balance.docs"
 import { BalanceRepo } from "../../persistence/balance/balance.schemas"
-import { UserRepo } from "../../persistence/user/user.schemas"
+import { NewBill, UserRepo } from "../../persistence/user/user.schemas"
 import moment from 'moment'
-import { GetSumBillsInADuration } from "../bills/bill.api"
+import { calculateSum, getBillsOfUserFromDB, Jso } from "../bills/bill.api"
+import { sumOfEverything, sumOfUnpaid } from "../bills/data"
+import fs from 'fs'
 
 const namespace = "CONTROLLER:[USERINFO]"
 
@@ -55,31 +57,41 @@ export const retrieveInfoDTO = async (username: string) => {
     if (doc === null) {
         return null
     } else {
-        const lean = await getLean(username, doc.accounts[0].balance, start, end)
+        let access_token = await nordigen.requestJWT()
+
+        const grossbalance = doc.accounts[0].balance
+        const lean = await getLean(access_token, username, grossbalance, start, end)
         const days = countDaysDifference(start, end)
-        const Gasdebt = 290 - 230 //decrease dao from 330 to 100 , so debt is 60
-        const safetyBuffer = 100
-        const transport = 22 * 3
+        const Gasdebt = 0 //decrease dao from 330 to 100 , so debt is 60
+        const safetyBuffer = 0
+        const transport = 0
         const myTaxes = Gasdebt + safetyBuffer + transport
+        const netto = parseFloat((lean - myTaxes).toFixed(3))
         const InfoDTO: UserInfoResultDoc = {
             _id: doc._id,
             nextIncome: {
                 amount: doc.salary.amount,
-                daysleft: days
+                daysleft: days,
+                weeksLeft: parseFloat((days / 7).toFixed(2))
             },
             balance: {
-                gross: doc.accounts[0].balance,
-                netto: lean - myTaxes
+                gross: grossbalance,
+                netto
             },
-            maxPerDay: (lean - myTaxes) / days
+            maxPerDay: parseFloat((netto / days).toFixed(2)),
+            maxPerWeek: parseFloat(((netto / days) * 7).toFixed(2)),
+            willBeSaved: safetyBuffer
         }
         return InfoDTO
     }
 
 }
-export const getLean = async (username: string, grossBalance: number, start: moment.Moment, end: moment.Moment) => {
-    const res = await GetSumBillsInADuration(username, start, end)
-    return grossBalance - res
+export const getLean = async (jwt: string, username: string, grossBalance: number, start: moment.Moment, end: moment.Moment) => {
+    // const analyzedBillS = await generateBillsAnalysis(jwt,username, start, end)
+    // const sum = calculateSum(analyzedBillS)
+
+    // console.info("Sum of Bills::", sum)
+    return grossBalance - sumOfUnpaid()
 }
 export const countDaysDifference = (beginDate: moment.Moment, endDate: moment.Moment
 ) => {
@@ -91,13 +103,16 @@ interface UserInfoResultDoc {
     _id: string,
     nextIncome: {
         amount: number,
-        daysleft: number
+        daysleft: number,
+        weeksLeft: number
     },
     balance: {
         gross: number,
         netto: number
     },
-    maxPerDay: number
+    maxPerDay: number,
+    maxPerWeek: number,
+    willBeSaved: number,
 }
 export const retrieveBalanceDTO = async (username: string) => {
 
@@ -128,6 +143,8 @@ interface BalanceDocResult {
     updatedAt: string
 }
 
+
+
 export const flowSim = async () => { //param _username: string
     //Get username from query param
     const username = "amddev"
@@ -143,9 +160,11 @@ export const flowSim = async () => { //param _username: string
         let access_token = await nordigen.requestJWT()
         let newBalance = await nordigen.requestBalance(access_token)
         console.log('New Balance received! ::' + newBalance)
-        //Update collection 
-        await updateBalanceDocument(newBalance, username)
-        await updateBalanceInUserInfoDocument(newBalance, username)
+        //Update Interim  collection
+        await updateBalanceDocument(newBalance!, username)
+
+        //UPdate Transactions collection
+        await updateBalanceInUserInfoDocument(newBalance!, username)
     }
     else {
         console.log("NOT GONNA REFRESH")
@@ -153,13 +172,24 @@ export const flowSim = async () => { //param _username: string
 
 }
 
-export const getBalanceFromBank = async () => {
+export const getBalanceFromBankTester = async () => {
     let access_token = await nordigen.requestJWT()
-    let newBalance = await nordigen.requestBalance(access_token)
+    let newBalance = await nordigen.requestBalance(access_token!)
 
     return newBalance
 }
+export const getTransactionsFromBankTester = async () => {
+    const start = moment({
+        year: moment().year(),
+        month: moment().month(),
+        day: moment().date(),
+    })
 
+    let access_token = await nordigen.requestJWT()
+    const BankTransactions = await nordigen.getTransactions(access_token!, start)
+
+    return BankTransactions
+}
 //Create a middleware that verifies if the user Account exists in db
 const getOneUserInfo = async (req: Request, res: Response) => {
     logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
@@ -172,9 +202,12 @@ const getOneUserInfo = async (req: Request, res: Response) => {
         let access_token = await nordigen.requestJWT()
         let newBalance = await nordigen.requestBalance(access_token)
         console.log('New Balance received! ::' + newBalance)
-        //Update collection 
-        await updateBalanceDocument(newBalance, username)
-        await updateBalanceInUserInfoDocument(newBalance, username)
+        //Update Bills 
+        await updateBills(username)
+        //Update Balance 
+        await updateBalanceDocument(newBalance!, username)
+        await updateBalanceInUserInfoDocument(newBalance!, username)
+
     }
     else {
         console.log("NO DB REFRESH REQUIRED; SKIPPING CALLKING THE BANK")
@@ -191,11 +224,108 @@ const getOneUserInfo = async (req: Request, res: Response) => {
 
 }
 
+export const updateBills = async (_username: string) => {
+    //Get Bills from db
+    const _bills = await getBillsOfUserFromDB(_username)
+    //Get Transactions from the beggning of the month 
+    const _transactions = await getTransactions(await nordigen.requestJWT(), moment({
+        year: moment().year(),
+        month: moment().month(),
+        day: 1
+    }))
+
+    // let jsonContent = JSON.stringify(_transactions);
+
+    //     fs.writeFile("Newtransactions.json", jsonContent, 'utf8', function (err) {
+    //         if (err) {
+    //             console.log("An error occured while writing JSON Object to File.");
+    //             return console.log(err);
+    //         }
+
+    //         console.log("JSON file has been saved.");
+    //     });
+    _bills.filter(o => o.paid === false && o.billType === 'creditorName').forEach(b => {
+        _transactions.forEach(t => {
+            if (t.creditorName !== undefined) {
+                if (removeSpacesFromString(b.bankText) === removeSpacesFromString(t.creditorName)) {
+                    //  console.log("BILL FOUND IN BANK",b.friendlyName)
+                    _bills.find(k => k.friendlyName === b.friendlyName)!.paid = true
+                }
+            }
+        })
+    })
+
+    _bills.filter(o => o.paid === false && o.billType === 'remittanceInformationStructured').forEach(b => {
+        _transactions.forEach(t => {
+            if (t.remittanceInformationStructured !== undefined) {
+                if (
+                    removeSpacesFromString(b.bankText) === removeSpacesFromString(t.remittanceInformationStructured)
+
+                ) {
+                    if ((t.amount * -1) === b.amount) {
+                          console.log("BILL FOUND IN BANK",b.friendlyName)
+                        _bills.find(k => k.friendlyName === b.friendlyName)!.paid = true
+                    }
+                    else {
+                         console.info(`found transaction for ${b.friendlyName} , ${b.amount} but price did not match`,t.amount * -1)
+
+                    }
+
+                }
+            }
+        })
+    })
+
+    console.info("_bill", _bills)
+
+}
+
+const BillFound = (b: NewBill, _transactions: Jso[]) => {
+    _transactions.forEach(t => {
+        if (t.creditorName !== undefined) {
+            if (removeSpacesFromString(b.bankText) === removeSpacesFromString(t.creditorName)) {
+                console.log("BILL FOUND IN BANK", b.friendlyName)
+                return true
+            }
+        }
+    })
+    return false
+    // else {
+    //     _transactions.forEach(t => {
+    //         if (t.remittanceInformationStructured) {
+    //             if (removeSpacesFromString(t.remittanceInformationStructured) === removeSpacesFromString(b.bankText)) {
+    //                 return true
+    //             }
+    //             else {
+
+    //             }
+    //         }
+    //     })
+    //     return false
+    // }
+}
+
+// 20mm
+// 3.8mm
+
+const removeOneSpace = (_str: string) => {
+    let index = _str.indexOf(" ")
+    let begin = _str.substring(0, index)
+    let end = _str.substring(index + 1)
+    return begin.concat(end)
+}
+export const removeSpacesFromString = (_str: string): string => {
+    if (_str.indexOf(" ") === -1) {
+        return _str
+    } else {
+        return removeSpacesFromString(removeOneSpace(_str))
+    }
+}
 //CHeck if user exists in db manually, add try catch 
-export const updateBalanceDocument = async (_amount: string, _username: string) => {
+export const updateBalanceDocument = async (_amount: number, _username: string) => {
 
     const filter = { username: _username }
-    const update = { amount: _amount }
+    const update = { amount: _amount.toString() }
     let doc = await BalanceRepo.Balance.findOneAndUpdate(filter, update, {
         new: true
     })
@@ -203,9 +333,13 @@ export const updateBalanceDocument = async (_amount: string, _username: string) 
 }
 
 //619ccb47714cfd0cb3bb4136 accId
-export const updateBalanceInUserInfoDocument = async (_amount: string, _username: string) => {
+export const updateBalanceInUserInfoDocument = async (_amount: number, _username: string) => {
+
+    //are there any to be booked transactions ?
+    //const interim = await nordigen.interim()
+    const update = { $set: { "accounts.$.balance": _amount.toString() } }
     const filter = { "username": _username, "accounts.accountType": 'main' }
-    const update = { $set: { "accounts.$.balance": _amount } }
+
     let doc = await UserRepo.Info.findOneAndUpdate(filter, update, {
         new: true
     })
@@ -268,6 +402,5 @@ export default {
 }
 
 
- 
- 
-  
+
+
