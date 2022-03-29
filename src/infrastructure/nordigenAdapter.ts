@@ -126,7 +126,7 @@ export const getTransactions = async (_jwt: string, start: moment.Moment) => {
             'Authorization': _jwt
         }
     })
-    console.info("TRANSACTI", res.data.transactions)
+    // console.info("TRANSACTI", res.data.transactions)
     const myT: Jso[] = []
 
     res.data.transactions.booked.forEach((t: any) => {

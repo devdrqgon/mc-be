@@ -4,10 +4,7 @@ import { stringify } from "querystring";
 import { Bill } from "../../domain/user.domain";
 import logging from "../../infrastructure/logging";
 import nordigen, { TransactionConverted } from "../../infrastructure/nordigenAdapter";
-import { UserRepo } from "../../persistence/user/user.schemas";
-import { getLastUpdateTime, shouldIRefresh } from "../userInfos/info.api";
-import InMemoryBills from './data'
-import { v4 as uuidv4, v4 } from 'uuid'
+import { NewBill, UserRepo } from "../../persistence/user/user.schemas";
 
 
 export const updateBill = (req: Request, res: Response) => {
@@ -102,7 +99,14 @@ export const getYetToBePaid = (when: {
     })
 }
 
-export type Jso = { remittanceInformationStructured: string; amount: number; creditorName: string; } | { amount: number; remittanceInformationStructured?: undefined; creditorName?: undefined; } | { remittanceInformationStructured: string; amount: number; creditorName?: undefined; }
+export type Jso =
+    {
+        remittanceInformationStructured: string; amount: number; creditorName: string;
+    }
+    |
+    { amount: number; remittanceInformationStructured?: undefined; creditorName?: undefined; }
+    |
+    { remittanceInformationStructured: string; amount: number; creditorName?: undefined; }
 
 // export const analyzecreditorNameNoPrice = (start: moment.Moment, end: moment.Moment, transactions: Array<Jso>) => {
 //     let analyzedBillS: AnalyzedBill[] = []
@@ -235,50 +239,7 @@ const countMonths = (beginDate: moment.Moment, endDate: moment.Moment) => {
     return nbOfMonths
 }
 
-export function getReccurenceBill(beginDate: moment.Moment, endDate: moment.Moment, billDate: {
-    start: number,
-    end: number
-}) {
 
-    /**
-        * create dates then ask timespan
-        * planstart 20.02
-        * end 23.03
-        * bill on 19 of every month
-        * rec:  3
-        */
-    //how many months?
-    // const nbOfMonths = countMonths(beginDate, endDate)
-    // let recurrence = 0
-
-    // if (nbOfMonths === 1) {
-    //     if (billDate.start > beginDate.date() && billDate.end < endDate.date()) {
-    //         return 1
-    //     }
-    //     return 0
-    // }
-    // if (nbOfMonths === 2) {
-    //     if (beginDate.date() < billDate.start) {
-    //         recurrence++
-    //     }
-    //     if (endDate.date() > billDate.end) {
-    //         recurrence++
-    //     }
-    //     return recurrence
-    // }
-    // else {
-    //     const _nbMnths = nbOfMonths - 2
-    //     if (beginDate.date() < billDate.start) {
-    //         recurrence++
-    //     }
-    //     if (endDate.date() > billDate.end) {
-    //         recurrence++
-    //     }
-    //     return recurrence + _nbMnths
-    // }
-
-    return 0
-}
 
 export function calculateSum(billsAnalyzed: AnalyzedBill[]) {
 
@@ -292,7 +253,7 @@ export function calculateSum(billsAnalyzed: AnalyzedBill[]) {
 }
 
 export const getBillsOfUserFromDB = async (username: string) => {
-    const bills = await UserRepo.Info.find({ username })
+    const bills = await UserRepo.NewInfo.find({ username })
         .select('bills')
         .exec()
         .then((bills: any) => {
@@ -304,7 +265,7 @@ export const getBillsOfUserFromDB = async (username: string) => {
 
             return null;
         })
-    return bills[0].bills as Bill[]
+    return bills[0].bills as NewBill[]
 
 
 }

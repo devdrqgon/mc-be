@@ -15,12 +15,12 @@ import billRoutes from "./apis/bills/bill.routes";
 import http from 'http';
 import config from "./infrastructure/config";
 import logging from "./infrastructure/logging";
-import { flowSim, getTransactionsFromBankTester, getLastUpdateTime, retrieveBalanceDTO, retrieveInfoDTO, updateBalanceDocument, updateBalanceInUserInfoDocument, getBalanceFromBankTester } from "./apis/userInfos/info.api";
-import { getBillsOfUserFromDB, getReccurenceBill,  Jso } from "./apis/bills/bill.api";
+import { flowSim, getTransactionsFromBankTester, getLastUpdateTime, retrieveBalanceDTO, retrieveInfoDTO, updateBalanceDocument, updateBalanceInUserInfoDocument, getBalanceFromBankTester, updateBills, removeSpacesFromString } from "./apis/userInfos/info.api";
 import moment from "moment";
 import nordigen, { getTransactions, TransactionConverted } from "./infrastructure/nordigenAdapter";
 import { Mongoose } from "mongoose";
-import {   sumOfEverything } from './apis/bills/data';
+import { sumOfEverything } from './apis/bills/data';
+import { initUserInfoDoc } from './apis/userInfos/tempInfo';
 // import nordigen from "./infrastructure/nordigenAdapter";
 
 
@@ -135,6 +135,9 @@ const NordigenTester = async () => {
     // console.info(" sumOfEverything() o",  sumOfEverything())
 
     //  analyzecreditorNameNoPrice(start2,end,t)
+    // await initUserInfoDoc()
+    await updateBills('amddev')
+    // console.log("Finale",removeSpacesFromString("Vodafone Deutschland GmbH                                             Beta-Str. 6-8"))
 }
 NordigenTester()
 const recurrenceTester = () => {
@@ -157,10 +160,10 @@ const recurrenceTester = () => {
 // recurrenceTester()
 // recurrenceTester()
 /** Create Server */
-const httpServer = http.createServer(app)
+//const httpServer = http.createServer(app)
 
 /** Start server  */
-httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
+//httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
 
 
 

@@ -1,7 +1,7 @@
 import logging from "../../infrastructure/logging";
 import { BillsRepo } from "../../persistence/bills/bills.schemas";
 
-export const sumOfEverything = () => {
+export const  sumOfEverything = () => {
     let sum = 0
     myBills.forEach(element => {
         sum = sum + element.amount
@@ -10,9 +10,23 @@ export const sumOfEverything = () => {
         sum = sum + element.amount
     });
  
-    return sum  
+    return 400  
 
 }
+
+
+export const sumOfUnpaid =   () => {
+    let sum = 0
+
+    
+    manualBills.forEach(element => {
+        sum = sum + element.amount
+    });
+ 
+    return 550 
+
+}
+
 const myBills = [
     {
         friendlyName: 'GetSafe1',
