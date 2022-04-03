@@ -49,6 +49,8 @@ export interface NewUserInfoSchema {
         dayOfMonth: PeriodOfTime
     },
     bills: Array<NewBill>,
+    paypalBills: Array<NewBill>,
+    manualBills: Array<NewBill>,
     accounts: Array<NewAccount>
 }
 //Dont force a design , e,g when u naned this file user.reop
@@ -88,6 +90,104 @@ const newUserInfoSchema = new Schema<NewUserInfoSchema>(
             }
         ),
         bills: [
+            new Schema<NewBill>(
+                {
+                    friendlyName: {
+                        type: String,
+                        required: true
+                    },
+                    username: {
+                        type: String,
+                        required: true
+                    },
+                    paid: {
+                        type: Boolean,
+                        required: true
+                    },
+                    bankText: {
+                        type: String,
+                        required: true
+                    },
+                    billType: {
+                        type: String,
+                        required: true
+                    },
+                    when: new Schema(
+                        {
+                            start: {
+                                type: Number,
+                                required: true
+                            },
+                            end: {
+                                type: Number,
+                                required: true
+                            }
+                        },
+                        {
+                            _id: false,
+                            timestamps: false
+                        }
+                    ),
+                    amount: {
+                        type: Number,
+                        required: true
+                    }
+                },
+                {
+                    _id: true,
+                    timestamps: false
+                }
+            )],
+        paypalBills: [
+            new Schema<NewBill>(
+                {
+                    friendlyName: {
+                        type: String,
+                        required: true
+                    },
+                    username: {
+                        type: String,
+                        required: true
+                    },
+                    paid: {
+                        type: Boolean,
+                        required: true
+                    },
+                    bankText: {
+                        type: String,
+                        required: true
+                    },
+                    billType: {
+                        type: String,
+                        required: true
+                    },
+                    when: new Schema(
+                        {
+                            start: {
+                                type: Number,
+                                required: true
+                            },
+                            end: {
+                                type: Number,
+                                required: true
+                            }
+                        },
+                        {
+                            _id: false,
+                            timestamps: false
+                        }
+                    ),
+                    amount: {
+                        type: Number,
+                        required: true
+                    }
+                },
+                {
+                    _id: true,
+                    timestamps: false
+                }
+            )],
+        manualBills: [
             new Schema<NewBill>(
                 {
                     friendlyName: {

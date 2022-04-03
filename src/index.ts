@@ -136,87 +136,16 @@ const NordigenTester = async () => {
 
     //  analyzecreditorNameNoPrice(start2,end,t)
     // await initUserInfoDoc()
-    await updateBills('amddev')
+    // await updateBills('amddev')
     // console.log("Finale",removeSpacesFromString("Vodafone Deutschland GmbH                                             Beta-Str. 6-8"))
 }
-NordigenTester()
-const recurrenceTester = () => {
-    const start = moment({
-        year: 2022,
-        month: 2,
-        day: 30
-    })
-    const end = moment({
-        year: 2022,
-        month: 5,
-        day: 30
-    })
-    const billDate = 22 //Make sure getReccurenceBill gets billdate as number not string
-    // const rec  = getReccurenceBill(start, end, billDate)
+//  NordigenTester()
 
-    // console.info("RECURRENCE ::", rec)
-}
-
-// recurrenceTester()
-// recurrenceTester()
 /** Create Server */
-//const httpServer = http.createServer(app)
+const httpServer = http.createServer(app)
 
 /** Start server  */
-//httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
+httpServer.listen(config.server.port, () => logging.info(NAMESPACE, `Server is running ${config.server.hostname}:${config.server.port}`));
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-function getSum(arg0: string) {
-    throw new Error("Function not implemented.");
-}
-
-/**
- * 
- * 
- * {
-      additionalInformation: 'FOLGELASTSCHRIFT',
-      bookingDate: '2022-02-01',
-      creditorAccount: [Object],
-      creditorAgent: 'DEUTDEFF',
-      creditorName: 'PayPal (Europe) S.a.r.l. et Cie., S.C.A.',
-      debtorAgent: 'HEISDE66',
-      endToEndId: '1018196478281 PP.7317.PP PAYPAL',
-      entryReference: '2022-02-01-04.25.46.774454',
-      mandateId: '4AG2224SC2RGY',
-      proprietaryBankTransactionCode: 'NDDT+105+9250+992-DK',
-      remittanceInformationStructured: 'PP.7317.PP . Getsafe Digital GmbH, Ihr Einkauf bei Getsafe Digital GmbH',
-      transactionAmount: [Object],
-      transactionId: '516b94d9d83c2b4e6a06f31ce87afca0',
-      valueDate: '2022-02-01'
-    },
-
-
-    {
-      additionalInformation: 'FOLGELASTSCHRIFT',
-      bookingDate: '2022-02-01',
-      creditorAccount: [Object],
-      creditorAgent: 'DEUTDEFF',
-      creditorName: 'PayPal (Europe) S.a.r.l. et Cie., S.C.A.',
-      debtorAgent: 'HEISDE66',
-      endToEndId: '1018196479072 PP.7317.PP PAYPAL',
-      entryReference: '2022-02-01-04.22.34.265170',
-      mandateId: '4AG2224SC2RGY',
-      proprietaryBankTransactionCode: 'NDDT+105+9250+992-DK',
-      remittanceInformationStructured: 'PP.7317.PP . Getsafe Digital GmbH, Ihr Einkauf bei Getsafe Digital GmbH',
-      transactionAmount: [Object],
-      transactionId: '67fa5f65b183d94e8cec3ef562e457e7',
-      valueDate: '2022-02-01'
-    },
- */

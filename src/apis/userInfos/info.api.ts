@@ -45,11 +45,7 @@ export const retrieveInfoDTO = async (username: string) => {
         month: moment().month(),
         day: moment().date(),
     })
-    const end = moment({
-        year: 2022,
-        month: 2,
-        day: 30
-    })
+    const end = moment("2022-04-30")
     const doc: any = await UserRepo.
         Info.findOne({ username: username }).exec()
     // console.info('Retrived infoDoc from MongoDB ::', doc)
@@ -62,11 +58,11 @@ export const retrieveInfoDTO = async (username: string) => {
         const grossbalance = doc.accounts[0].balance
         const lean = await getLean(access_token, username, grossbalance, start, end)
         const days = countDaysDifference(start, end)
-        const Gasdebt = 0 //decrease dao from 330 to 100 , so debt is 60
-        const safetyBuffer = 0
-        const transport = 0
-        const myTaxes = Gasdebt + safetyBuffer + transport
+        const myTaxes = 0
         const netto = parseFloat((lean - myTaxes).toFixed(3))
+
+        const _bills = await getBillsOfUserFromDB(username)
+
         const InfoDTO: UserInfoResultDoc = {
             _id: doc._id,
             nextIncome: {
@@ -80,7 +76,12 @@ export const retrieveInfoDTO = async (username: string) => {
             },
             maxPerDay: parseFloat((netto / days).toFixed(2)),
             maxPerWeek: parseFloat(((netto / days) * 7).toFixed(2)),
-            willBeSaved: safetyBuffer
+            willBeSaved: 0,
+            bills: {
+                bills: _bills.normalBills,
+                manualBills: _bills.manualBills,
+                paypalBills: _bills.paypalBills
+            }
         }
         return InfoDTO
     }
@@ -99,6 +100,12 @@ export const countDaysDifference = (beginDate: moment.Moment, endDate: moment.Mo
     // console.info("Diff", duration.asDays())
     return Math.round(duration.asDays())
 }
+interface FeBill {
+    _id: string,
+    _friendlyName: string,
+    _amount: number,
+    paid: boolean
+}
 interface UserInfoResultDoc {
     _id: string,
     nextIncome: {
@@ -113,6 +120,11 @@ interface UserInfoResultDoc {
     maxPerDay: number,
     maxPerWeek: number,
     willBeSaved: number,
+    bills: {
+        bills: NewBill[],
+        paypalBills: NewBill[],
+        manualBills: NewBill[],
+    }
 }
 export const retrieveBalanceDTO = async (username: string) => {
 
@@ -244,18 +256,18 @@ export const updateBills = async (_username: string) => {
 
     //         console.log("JSON file has been saved.");
     //     });
-    _bills.filter(o => o.paid === false && o.billType === 'creditorName').forEach(b => {
+    _bills.normalBills.filter(o => o.paid === false && o.billType === 'creditorName').forEach(b => {
         _transactions.forEach(t => {
             if (t.creditorName !== undefined) {
                 if (removeSpacesFromString(b.bankText) === removeSpacesFromString(t.creditorName)) {
                     //  console.log("BILL FOUND IN BANK",b.friendlyName)
-                    _bills.find(k => k.friendlyName === b.friendlyName)!.paid = true
+                    _bills.normalBills.find(k => k.friendlyName === b.friendlyName)!.paid = true
                 }
             }
         })
     })
 
-    _bills.filter(o => o.paid === false && o.billType === 'remittanceInformationStructured').forEach(b => {
+    _bills.normalBills.filter(o => o.paid === false && o.billType === 'remittanceInformationStructured').forEach(b => {
         _transactions.forEach(t => {
             if (t.remittanceInformationStructured !== undefined) {
                 if (
@@ -263,11 +275,11 @@ export const updateBills = async (_username: string) => {
 
                 ) {
                     if ((t.amount * -1) === b.amount) {
-                          console.log("BILL FOUND IN BANK",b.friendlyName)
-                        _bills.find(k => k.friendlyName === b.friendlyName)!.paid = true
+                        console.log("BILL FOUND IN BANK", b.friendlyName)
+                        _bills.normalBills.find(k => k.friendlyName === b.friendlyName)!.paid = true
                     }
                     else {
-                         console.info(`found transaction for ${b.friendlyName} , ${b.amount} but price did not match`,t.amount * -1)
+                        console.info(`found transaction for ${b.friendlyName} , ${b.amount} but price did not match`, t.amount * -1)
 
                     }
 

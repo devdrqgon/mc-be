@@ -1,7 +1,7 @@
 import logging from "../../infrastructure/logging";
 import { BillsRepo } from "../../persistence/bills/bills.schemas";
 
-export const  sumOfEverything = () => {
+export const sumOfEverything = () => {
     let sum = 0
     myBills.forEach(element => {
         sum = sum + element.amount
@@ -9,24 +9,87 @@ export const  sumOfEverything = () => {
     manualBills.forEach(element => {
         sum = sum + element.amount
     });
- 
-    return 400  
+
+    return 400
 
 }
 
 
-export const sumOfUnpaid =   () => {
+export const sumOfUnpaid = () => {
     let sum = 0
 
-    
+
     manualBills.forEach(element => {
         sum = sum + element.amount
     });
- 
-    return 550 
+
+    return 700
 
 }
+/**
+ * 03.04
+ * current sparkasse balance: 1390
+ * paypal: to be paid this month: 115.
+ * paypal bills to be paid 126.7
+ * bills: to be paid 448.7
+ * netto left: 700
+ */
+const paypalBills = [
+    {
+        friendlyName: 'paypal waschmachine',
+        text: '. PAYPAL-ZAHLUNG UBER LASTSCHRIFT an',
+        amount: 54.28,
+        when: {
+            start: 25,
+            end: 27
+        },
+        billType: 'remittanceInformationStructured'
 
+    },
+    {
+        friendlyName: 'paypal tische',
+        text: '. PAYPAL-ZAHLUNG UBER LASTSCHRIFT an',
+        amount: 29.15,
+        when: {
+            start: 25,
+            end: 27
+        },
+        billType: 'remittanceInformationStructured'
+
+    },
+    {
+        friendlyName: 'paypal guitar',
+        text: '. PAYPAL-ZAHLUNG UBER LASTSCHRIFT an',
+        amount: 22.5,
+        when: {
+            start: 8,
+            end: 11
+        },
+        billType: 'remittanceInformationStructured'
+
+    },
+    {
+        friendlyName: 'paypal ecollar',
+        text: '. PAYPAL-ZAHLUNG UBER LASTSCHRIFT an',
+        amount: 10.98,
+        when: {
+            start: 23,
+            end: 25
+        },
+        billType: 'remittanceInformationStructured'
+
+    },
+    {
+        friendlyName: 'paypal jareya',
+        text: '. PAYPAL-ZAHLUNG UBER LASTSCHRIFT an',
+        amount: 9.16,
+        when: {
+            start: 22,
+            end: 24
+        },
+        billType: 'remittanceInformationStructured'
+
+    }]
 const myBills = [
     {
         friendlyName: 'GetSafe1',
@@ -62,56 +125,12 @@ const myBills = [
 
     },
     {
-        friendlyName: 'paypal waschmachine',
-        text: '. PAYPAL-ZAHLUNG UBER LASTSCHRIFT an',
-        amount: 54.28,
+        friendlyName: 'google',
+        text: 'PP.7317.PP . Google, Ihr Einkauf bei Google',
+        amount: 12,
         when: {
-            start: 25,
-            end: 27
-        },
-        billType: 'remittanceInformationStructured'
-
-    },
-    {
-        friendlyName: 'paypal tische',
-        text: '. PAYPAL-ZAHLUNG UBER LASTSCHRIFT an',
-        amount: 29.15,
-        when: {
-            start: 25,
-            end: 27
-        },
-        billType: 'remittanceInformationStructured'
-
-    },
-    {
-        friendlyName: 'paypal guitar',
-        text: '. PAYPAL-ZAHLUNG UBER LASTSCHRIFT an',
-        amount: 22.5,
-        when: {
-            start: 8,
-            end: 11
-        },
-        billType: 'remittanceInformationStructured'
-
-    },
-    {
-        friendlyName: 'paypal bed',
-        text: '. PAYPAL-ZAHLUNG UBER LASTSCHRIFT an',
-        amount: 60.54,
-        when: {
-            start: 30,
-            end: 1
-        },
-        billType: 'remittanceInformationStructured'
-
-    },
-    {
-        friendlyName: 'paypal jareya',
-        text: '. PAYPAL-ZAHLUNG UBER LASTSCHRIFT an',
-        amount: 9.16,
-        when: {
-            start: 22,
-            end: 24
+            start: 1,
+            end: 2
         },
         billType: 'remittanceInformationStructured'
 
@@ -237,15 +256,26 @@ const manualBills = [
         },
         amount: 850,
         billType: 'creditorName'
-    }
+    },
+    {
+        friendlyName: 'gas',
+        text: 'gas',
+        when: {
+            start: 25,
+            end: 25
+        },
+        amount: 150,
+        billType: 'creditorName'
+    },
 
 ]
- 
+
 
 
 const InMemoryBills = {
     myBills,
     manualBills,
+    paypalBills
 }
 
 export const saveBillsInDB = async () => {
@@ -267,5 +297,5 @@ export const saveBillsInDB = async () => {
 
     })
 }
- 
+
 export default InMemoryBills

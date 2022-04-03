@@ -265,8 +265,50 @@ export const getBillsOfUserFromDB = async (username: string) => {
 
             return null;
         })
-    return bills[0].bills as NewBill[]
 
+
+    const normalBills = bills[0].bills as NewBill[]
+
+    const paypalbills = await UserRepo.NewInfo.find({ username })
+        .select('paypalBills')
+        .exec()
+        .then((bills: any) => {
+            //  console.info(bills)
+            return bills;
+        })
+        .catch((err) => {
+            logging.error("[billsAPI]", err.message, err);
+
+            return null;
+        })
+
+
+    const paypalBills = paypalbills[0].paypalBills as NewBill[]
+
+    const manualbills = await UserRepo.NewInfo.find({ username })
+        .select('manualBills')
+        .exec()
+        .then((bills: any) => {
+            //  console.info(bills)
+            return bills;
+        })
+        .catch((err) => {
+            logging.error("[billsAPI]", err.message, err);
+
+            return null;
+        })
+
+
+    const manualBills = manualbills[0].manualBills as NewBill[]
+
+    const ex ={
+        normalBills,
+        paypalBills,
+        manualBills
+    }
+
+    console.info("BILLS",ex)
+    return ex
 
 }
 
