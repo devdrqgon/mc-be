@@ -253,61 +253,25 @@ export function calculateSum(billsAnalyzed: AnalyzedBill[]) {
 }
 
 export const getBillsOfUserFromDB = async (username: string) => {
-    const bills = await UserRepo.NewInfo.find({ username })
-        .select('bills')
+   
+    const doc = await UserRepo.NewInfo.find({ username })
         .exec()
-        .then((bills: any) => {
+        .then((doc: any) => {
             //  console.info(bills)
-            return bills;
+            return doc;
         })
         .catch((err) => {
             logging.error("[billsAPI]", err.message, err);
 
             return null;
         })
-
-
-    const normalBills = bills[0].bills as NewBill[]
-
-    const paypalbills = await UserRepo.NewInfo.find({ username })
-        .select('paypalBills')
-        .exec()
-        .then((bills: any) => {
-            //  console.info(bills)
-            return bills;
-        })
-        .catch((err) => {
-            logging.error("[billsAPI]", err.message, err);
-
-            return null;
-        })
-
-
-    const paypalBills = paypalbills[0].paypalBills as NewBill[]
-
-    const manualbills = await UserRepo.NewInfo.find({ username })
-        .select('manualBills')
-        .exec()
-        .then((bills: any) => {
-            //  console.info(bills)
-            return bills;
-        })
-        .catch((err) => {
-            logging.error("[billsAPI]", err.message, err);
-
-            return null;
-        })
-
-
-    const manualBills = manualbills[0].manualBills as NewBill[]
-
-    const ex ={
-        normalBills,
-        paypalBills,
-        manualBills
+    const ex = {
+        normalBills :doc[0].bills as NewBill[],
+        paypalBills : doc[0].paypalBills as NewBill[],
+        manualBills: doc[0].manualBills as NewBill[]
     }
 
-    console.info("BILLS",ex)
+    console.info("BILLS", ex)
     return ex
 
 }
