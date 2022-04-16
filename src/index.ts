@@ -136,10 +136,10 @@ const NordigenTester = async () => {
 
     //  analyzecreditorNameNoPrice(start2,end,t)
     // await initUserInfoDoc()
-    // await updateBills('amddev')
+    await updateBills('amddev')
     // console.log("Finale",removeSpacesFromString("Vodafone Deutschland GmbH                                             Beta-Str. 6-8"))
 }
-//  NordigenTester()
+ NordigenTester()
 
 /** Create Server */
 const httpServer = http.createServer(app)

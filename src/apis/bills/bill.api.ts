@@ -271,7 +271,6 @@ export const getBillsOfUserFromDB = async (username: string) => {
         manualBills: doc[0].manualBills as NewBill[]
     }
 
-    console.info("BILLS", ex)
     return ex
 
 }

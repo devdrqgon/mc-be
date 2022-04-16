@@ -127,7 +127,7 @@ const myBills = [
     {
         friendlyName: 'google',
         text: 'PP.7317.PP . Google, Ihr Einkauf bei Google',
-        amount: 12,
+        amount: 11.99,
         when: {
             start: 1,
             end: 2

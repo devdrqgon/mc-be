@@ -88,11 +88,14 @@ export const retrieveInfoDTO = async (username: string) => {
 
 }
 export const getLean = async (jwt: string, username: string, grossBalance: number, start: moment.Moment, end: moment.Moment) => {
-    // const analyzedBillS = await generateBillsAnalysis(jwt,username, start, end)
-    // const sum = calculateSum(analyzedBillS)
+    const _bills = await getBillsOfUserFromDB(username)
+    let sumOfUnpaid = 0
+    sumOfUnpaid = _bills.manualBills.filter(b => b.paid === false).reduce((partialSum, a) => partialSum + a.amount, 0);
+    sumOfUnpaid = sumOfUnpaid + _bills.paypalBills.filter(b => b.paid === false).reduce((partialSum, a) => partialSum + a.amount, 0);
+    sumOfUnpaid = sumOfUnpaid + _bills.manualBills.filter(b => b.paid === false).reduce((partialSum, a) => partialSum + a.amount, 0);
 
     // console.info("Sum of Bills::", sum)
-    return grossBalance - sumOfUnpaid()
+    return grossBalance - sumOfUnpaid
 }
 export const countDaysDifference = (beginDate: moment.Moment, endDate: moment.Moment
 ) => {
@@ -288,7 +291,7 @@ export const updateBills = async (_username: string) => {
         })
     })
 
-    console.info("_bill", _bills)
+    console.info("_bill", _bills.normalBills)
 
 }
 
