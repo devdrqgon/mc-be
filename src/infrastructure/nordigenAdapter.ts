@@ -74,11 +74,11 @@ const requestBalance = async (_jwt: string) => {
             'Authorization': _jwt
         }
     })
-    console.info("good job bouhmid, your closingBookedbalance0 is:", res.data.balances[0].balanceAmount.amount)
-    console.info("good job bouhmid, your interimAvailablebalance1 is:", res.data.balances[1].balanceAmount.amount)
+    // console.info("good job bouhmid, your closingBookedbalance0 is:", res.data.balances[0].balanceAmount.amount)
+    // console.info("good job bouhmid, your interimAvailablebalance1 is:", res.data.balances[1].balanceAmount.amount)
 
     const interim = await getInterimFromBank(_jwt)
-    console.info("Interim", interim)
+    // console.info("Interim", interim)
     // return 1822.61 + interim
     return parseFloat(res.data.balances[0].balanceAmount.amount) + interim
 
@@ -116,7 +116,7 @@ export const getTransactions = async (_jwt: string, start: moment.Moment) => {
     // // console.log(`Bearer ${_jwt}`)
     const startParamQuery = encodeURIComponent(start.format('YYYY-MM-DD'))
 
-    console.info("start", startParamQuery)
+    // console.info("start", startParamQuery)
     let res = await axios({
         method: 'GET',
         url: `https://ob.nordigen.com/api/v2/accounts/609c3976-df41-4253-ae1a-6be551db8959/transactions?date_from=${startParamQuery}`,

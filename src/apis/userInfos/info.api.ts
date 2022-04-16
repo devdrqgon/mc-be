@@ -19,14 +19,17 @@ export const shouldIRefresh = (xHours: number, _nowTime: string, _lastUpdateTime
     //FormatDate 
     const formattedLastUpdt = moment(_lastUpdateTime)
     const formattedNowTime = moment(_nowTime)
-    console.log("formattedLastUpdt IS ", formattedLastUpdt)
+    console.log("formattedLastUpdt IS ", formattedLastUpdt.format('HH-MM-SS'))
     console.log("formattedNowTime IS ", formattedNowTime)
     const duration = moment.duration(formattedNowTime.diff(formattedLastUpdt))
     const hours = duration.asHours()
     const timePassed = parseFloat(hours.toFixed(2))
     console.log("HOURS PASSED SINCE LAST UPDATE ::", timePassed)
     if (xHours < timePassed) { return true }
-    return false
+    else {
+        return false
+
+    }
 
 }
 
@@ -133,7 +136,7 @@ export const retrieveBalanceDTO = async (username: string) => {
 
     const doc: any = await BalanceRepo.
         Balance.findOne({ username: username }).exec()
-    console.info('Retrived BalanceDoc from MongoDB ::', doc)
+    // console.info('Retrived BalanceDoc from MongoDB ::', doc)
 
     if (doc === null) {
         return null
@@ -168,7 +171,7 @@ export const flowSim = async () => { //param _username: string
     //to check how recent the balance data is
     // 2022-02-10T14:29:23.462+00:00
     const lstUpdateTime = await getLastUpdateTime('amddev')
-    const refresh = shouldIRefresh(1, moment().format(), lstUpdateTime!)// '2022-02-10T13:29:23.462+00:00'
+    const refresh = shouldIRefresh(4, moment().format(), lstUpdateTime!)// '2022-02-10T13:29:23.462+00:00'
 
     if (refresh === true) {
         console.log("REFRESHING FROM BANK")
@@ -211,7 +214,7 @@ const getOneUserInfo = async (req: Request, res: Response) => {
     const username = req.params.username as string
 
     const lstUpdateTime = await getLastUpdateTime('amddev')
-    const refresh = shouldIRefresh(8, moment().format(), lstUpdateTime!)
+    const refresh = shouldIRefresh(4, moment().format(), lstUpdateTime!)
     if (refresh === true) {
         console.log("REFRESHING FROM BANK")
         let access_token = await nordigen.requestJWT()
@@ -231,7 +234,7 @@ const getOneUserInfo = async (req: Request, res: Response) => {
 
     const dto = await retrieveInfoDTO(username)
 
-    console.info("User new info", dto)
+    // console.info("User new info", dto)
 
 
 
@@ -282,7 +285,7 @@ export const updateBills = async (_username: string) => {
                         _bills.normalBills.find(k => k.friendlyName === b.friendlyName)!.paid = true
                     }
                     else {
-                        console.info(`found transaction for ${b.friendlyName} , ${b.amount} but price did not match`, t.amount * -1)
+                        // console.info(`found transaction for ${b.friendlyName} , ${b.amount} but price did not match`, t.amount * -1)
 
                     }
 
@@ -291,7 +294,7 @@ export const updateBills = async (_username: string) => {
         })
     })
 
-    console.info("_bill", _bills.normalBills)
+    // console.info("_bill", _bills.normalBills)
 
 }
 
