@@ -50,7 +50,7 @@ export const retrieveInfoDTO = async (username: string) => {
     })
     const end = moment("2022-04-30")
     const doc: any = await UserRepo.
-        Info.findOne({ username: username }).exec()
+        NewInfo.findOne({ username: username }).exec()
     // console.info('Retrived infoDoc from MongoDB ::', doc)
 
     if (doc === null) {
@@ -210,11 +210,12 @@ export const getTransactionsFromBankTester = async () => {
 }
 //Create a middleware that verifies if the user Account exists in db
 const getOneUserInfo = async (req: Request, res: Response) => {
+    console.info("I  M HIT")
     logging.info(`CONTROLLER:${namespace}`, "attempting to get user info..", req.query.username)
     const username = req.params.username as string
 
     const lstUpdateTime = await getLastUpdateTime('amddev')
-    const refresh = shouldIRefresh(4, moment().format(), lstUpdateTime!)
+    const refresh = shouldIRefresh(0, moment().format(), lstUpdateTime!)
     if (refresh === true) {
         console.log("REFRESHING FROM BANK")
         let access_token = await nordigen.requestJWT()
@@ -355,10 +356,10 @@ export const updateBalanceInUserInfoDocument = async (_amount: number, _username
 
     //are there any to be booked transactions ?
     //const interim = await nordigen.interim()
-    const update = { $set: { "accounts.$.balance": _amount.toString() } }
+    const update = { $set: { "accounts.$.balance": _amount } }
     const filter = { "username": _username, "accounts.accountType": 'main' }
 
-    let doc = await UserRepo.Info.findOneAndUpdate(filter, update, {
+    let doc = await UserRepo.NewInfo.findOneAndUpdate(filter, update, {
         new: true
     })
     // console.log(doc)
@@ -366,57 +367,55 @@ export const updateBalanceInUserInfoDocument = async (_amount: number, _username
 
 }
 
-const createOneUserInfo = (req: Request, res: Response) => {
-    logging.info(`CONTROLLER:${namespace}`, "attempting to create UserInfo..", req.body)
+// const createOneUserInfo = (req: Request, res: Response) => {
+//     logging.info(`CONTROLLER:${namespace}`, "attempting to create UserInfo..", req.body)
 
-    const {
-        username: reqUsername, salary: reqSalary,
-        dayOfMonthOfSalary, weeklyBudget: reqWeeklyBudget,
-        bills: reqBills, accounts: reqAccounts
-    } = req.body
-
-
-
-    const _userInfoDoc = new UserRepo.Info({
-        id: new mongoose.Types.ObjectId(), // maaaybe small maybe exclude mongoose from this file and move it to the 
-        username: reqUsername,
-        salary: reqSalary,
-        dayOfMonthOfSalary: dayOfMonthOfSalary,
-        bills: reqBills,
-        accounts: reqAccounts,
-        weeklyBudget: reqWeeklyBudget
-
-    })
-
-    //Save it!
+//     const {
+//         username: reqUsername, salary: reqSalary,
+//         dayOfMonthOfSalary, weeklyBudget: reqWeeklyBudget,
+//         bills: reqBills, accounts: reqAccounts
+//     } = req.body
 
 
-    return _userInfoDoc.save()
-        .then((info: any) => {
-            logging.info(`CONTROLLER:${namespace}`, " UserInfo Created..", info)
 
-            res.status(201).json({ info })
-        })
-        .catch((error: any) => {
-            logging.error(`CONTROLLER:${namespace}`, " UserInfo POST Failed..", error)
+//     const _userInfoDoc = new UserRepo.NewInfo({
+//         id: new mongoose.Types.ObjectId(), // maaaybe small maybe exclude mongoose from this file and move it to the 
+//         username: reqUsername,
+//         salary: reqSalary,
+//         dayOfMonthOfSalary: dayOfMonthOfSalary,
+//         bills: reqBills,
+//         accounts: reqAccounts,
+//         weeklyBudget: reqWeeklyBudget
 
-            res.status(500).json({
-                message: error.message,
-                error
-            })
-        })
+//     })
 
-}
+//     //Save it!
 
-const UpdateOneUserInfo = () => { }
+
+//     return _userInfoDoc.save()
+//         .then((info: any) => {
+//             logging.info(`CONTROLLER:${namespace}`, " UserInfo Created..", info)
+
+//             res.status(201).json({ info })
+//         })
+//         .catch((error: any) => {
+//             logging.error(`CONTROLLER:${namespace}`, " UserInfo POST Failed..", error)
+
+//             res.status(500).json({
+//                 message: error.message,
+//                 error
+//             })
+//         })
+
+// }
+
+// const UpdateOneUserInfo = () => { }
 
 
 
 
 export default {
-    getOneUserInfo,
-    createOneUserInfo,
-    UpdateOneUserInfo
+    getOneUserInfo
 }
 
 

@@ -7,27 +7,27 @@ import nordigen, { TransactionConverted } from "../../infrastructure/nordigenAda
 import { NewBill, UserRepo } from "../../persistence/user/user.schemas";
 
 
-export const updateBill = (req: Request, res: Response) => {
-    const billId = req.params.id as string
-    const {
-        username: username, cost: reqCost,
-        when: reqWhen, paid: reqPaid,
-        billName: reqBillName
-    } = req.body
+// export const updateBill = (req: Request, res: Response) => {
+//     const billId = req.params.id as string
+//     const {
+//         username: username, cost: reqCost,
+//         when: reqWhen, paid: reqPaid,
+//         billName: reqBillName
+//     } = req.body
 
-    UserRepo.Info.findOneAndUpdate(
-        { "username": username, "bills._id": billId },
-        { $set: { "bills.$.paid": reqPaid } },
-        (error: any, data: any) => {
-            if (error) {
-                console.error(error)
-            } else {
-                return res.status(200).json('ok')
+//     UserRepo.Info.findOneAndUpdate(
+//         { "username": username, "bills._id": billId },
+//         { $set: { "bills.$.paid": reqPaid } },
+//         (error: any, data: any) => {
+//             if (error) {
+//                 console.error(error)
+//             } else {
+//                 return res.status(200).json('ok')
 
-            }
-        })
+//             }
+//         })
 
-}
+// }
 
 
 export const getTimesAlreadyPaidWithcreditorNameOnly = (creditorName: string, transactions: Array<Jso>) => {

@@ -6,7 +6,5 @@ const router = express.Router()
 
 // router.get('/get/all',validateJWT, UserInfoAPI.getAllUserInfos) // / or empty string
 router.get('/:username', validateJWT, UserInfoAPI.getOneUserInfo)
-router.post('/', validateJWT, UserInfoAPI.createOneUserInfo)
-router.put('/:username', validateJWT, UserInfoAPI.UpdateOneUserInfo)
 
 export = router

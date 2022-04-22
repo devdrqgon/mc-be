@@ -43,7 +43,7 @@ const signJWT = (
 
 //refactor this
 const checkIfUsernameIsFoundUnique = (username: string) => {
-    UserRepo.Info.find({ username })
+    UserRepo.NewInfo.find({ username })
         .exec()
         .then((res) => {
             switch (res.length) {
