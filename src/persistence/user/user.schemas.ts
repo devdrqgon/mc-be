@@ -261,104 +261,6 @@ const newUserInfoSchema = new Schema<NewUserInfoSchema>(
     }
 
 )
-const userInfoWithSalarySchema = new Schema(
-    {
-        username: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        salary: new Schema(
-            {
-                amount: {
-                    type: Number,
-                    required: true
-                },
-                dayOfMonth: {
-                    type: Number,
-                    required: true
-                }
-            },
-            {
-                _id: false,
-                timestamps: false
-            }
-        ),
-        bills: [new Schema(
-            {
-                billName: {
-                    type: String,
-                    required: true
-                },
-                username: {
-                    type: String,
-                    required: true
-                },
-                paid: {
-                    type: Boolean,
-                    required: true
-                },
-                cost: {
-                    type: Number,
-                    required: true
-                },
-                when: {
-                    type: Number,
-                    required: true
-                }
-            },
-            {
-                _id: true,
-                timestamps: false
-            }
-        )],
-        accounts: [new Schema(
-            {
-                accountType: {
-                    type: String,
-                    required: true
-                },
-                balance: {
-                    type: Number,
-                    required: true
-                },
-                active: {
-                    type: Boolean,
-                    required: true
-                },
-
-            },
-            {
-                _id: true,
-                timestamps: false
-            }
-        )],
-        weeklyBudget: new Schema(
-            {
-                limit: {
-                    type: Number,
-                    required: true
-                },
-                spent: {
-                    type: Number,
-                    required: true
-                }
-            },
-            {
-                _id: false,
-                timestamps: false
-            }
-        ),
-        savingGoal: {
-            type: Number
-        },
-    },
-    {
-        timestamps: false,
-        versionKey: false
-    }
-
-)
 
 
 /** Did not name Userrepo, although it is a repo
@@ -368,12 +270,10 @@ const userInfoWithSalarySchema = new Schema(
 
 // TODO: rename to plural
 const Account = mongoose.model<IUserDoc>('userAccountSchema', userAccountSchema) //Rename faile to UserSChema ??????
-const Info = mongoose.model('userInfoSchema', userInfoWithSalarySchema) //Rename faile to UserSChema ??????
 const NewInfo = mongoose.model<NewUserInfoSchema>('newUserInfoSchema', newUserInfoSchema)
 
 
 export const UserRepo = {
     Account,
-    Info,
     NewInfo
 }
